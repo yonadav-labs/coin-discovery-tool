@@ -1,0 +1,165 @@
+<style>
+  .hackyhack {
+    position: relative;
+  }
+
+  .hackyhack .dropdown-menu {
+    left: auto !important;
+    right: 0px;
+    z-index: 100000
+  }
+</style>
+<div class="hbox hbox-auto-xs hbox-auto-sm">
+  <!-- main -->
+  <div class="col">
+    <!-- main header -->
+    <div class="bg-light lter b-b wrapper-md pb-3">
+      <div class="row">
+        <div class="col-sm-6 col-xs-12">
+          <h1 class="m-n font-thin h3 text-black">
+            <i class="icon-back-arrow"></i>User Details</h1>
+        </div>
+      </div>
+    </div>
+    <!-- / main header -->
+    <div style="margin-top: 20px;">
+      <div class="col-md-4">
+        <div>
+          <div class="wrapper bg-white-opacity">
+            <div class="row m-t">
+              <div class="col-sm-8">
+                <!-- <a href class="thumb-lg pull-left m-r">
+                      <img src="img/a0.jpg" class="img-circle">
+                    </a> -->
+                <div class="clear m-b" style="margin-left: 18px;">
+                  <div class="m-b m-t-sm">
+                    <span class="h3 text-black">{{selectedUser.first_name}} {{selectedUser.last_name}} </span>
+                  </div>
+                  <a ng-click="approveUser(selectedUser.id)" class="btn btn-sm btn-success" ng-if="!selectedUser.approved">Approve</a>
+                  <span class="label label-success" ng-if="selectedUser.approved">Approved Account</span>
+                  <br/>
+
+                </div>
+              </div>
+
+              <div class="padder">
+                <div class="col-sm-12 connected" ui-jq="sortable" ui-options="{items:'.panel', handle:'.panel-heading', connectWith:'.connected'}">
+
+                  <div class="panel panel-default">
+                    <div class="list-group bg-white">
+                      <a href class="list-group-item">
+                        <i class="fa fa-fw fa-envelope"></i> {{selectedUser.email}}
+                      </a>
+
+                      <a href class="list-group-item">
+                        <i class="fa fa-fw fa-phone"></i> {{selectedUser.phone}}
+                      </a>
+                      <a href class="list-group-item">
+                        <i class="fa fa-fw fa-map-marker"></i> {{selectedUser.zip_code}}
+                      </a>
+                      <a href class="list-group-item"> Date Joined: {{selectedUser.date_joined |  date:'MM-dd-yyyy'}}
+                      </a>
+                      <a href class="list-group-item"> Amount Invested: ${{depositsTotal || 0 | number:'2'}}
+                      </a>
+                      <a href class="list-group-item"> Investment Start:                       
+                        <span>{{selectedUser.investment_start_date |  date:'MM-dd-yyyy'}}</span>
+                        <button class="btn btn-xs btn-primary pull-right" ng-click="showDatePicker = !showDatePicker">
+                          {{selectedUser.investment_start_date? 'Edit':'Set'}}
+                        </button>
+                        <p class="input-group hackyhack" style="margin-top:15px;" ng-show="showDatePicker">
+                          <input type="text" class="form-control" datepicker-popup="yyyy-MM-dd" ng-model="postData.investment_start_date" is-open="date_opened"
+                            datepicker-options="dateOptions" ng-change="setInvestmentStartDate()" />
+                          <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="open($event)">
+                              <i class="glyphicon glyphicon-calendar"></i>
+                            </button>
+                          </span>
+                        </p>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-12 col-md-8">
+        <tabset class="tab-container">
+          <tab>
+            <tab-heading>
+              <i class="fa fa-money "></i> User Deposits
+            </tab-heading>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <span class=" pull-right m-t-xs deposit-btn">
+                  <a ng-click="toggleDepositForm(true)" ng-if="selectedUser.approved && !showDepositForm" class="btn btn-sm btn-primary">Add Deposit</a>
+                  <a ng-click="toggleDepositForm(false)" ng-if="showDepositForm" class="btn btn-sm btn-danger">Cancel Deposit</a>
+                </span>
+                User Deposits
+              </div>
+              <br/>
+              <form name="form" class="form-validation" ng-submit="addDeposit()" ng-if="showDepositForm">
+                <div class="alert alert-danger" ng-repeat="error in errors.non_field_errors">{{error}}</div>
+                <div class="list-group list-group-sm">
+                  <div class="list-group-item col-md-8 col-md-offset-1">
+                    <input type="number" placeholder="Amount" step="0.01" class="form-control no-border" ng-model="postData.amount" required>
+                  </div>
+                  <button type="submit" class="btn btn-lg btn-primary">Save </button>
+              </form>
+              </div>
+
+              <div ng-if="!showDepositForm">
+                <table datatable="ng" dt-options="datatableOptions" class="table table-striped m-b-none">
+                  <thead>
+                    <tr>
+                      <th>Amount</th>
+                      <th>Date</th>
+                      <th>Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr ng-repeat="d in deposits">
+                      <td>${{d.amount || 0 | number:'2'}}</td>
+                      <td>{{d.created |  date:'MM-dd-yyyy'}}</td>
+                      <td>{{d.created | date:'HH:mm:ss'}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </tab>
+          <tab>
+            <tab-heading>
+              <i class="icon-key "></i> Login Activities
+            </tab-heading>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                Logins
+              </div>
+              <table class="table" datatable="ng" dt-options="datatableOptions">
+                <thead>
+                  <tr>
+                    <th>IP</th>
+                    <th>Browser</th>
+                    <th>Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="login in logins">
+                    <td>{{login.ip}}</td>
+                    <td>{{login.browser}}</td>
+                    <td>{{login.time | date:'yyyy-MM-dd HH:mm:ss '}}</td>
+                  </tr>
+
+                </tbody>
+              </table>
+            </div>
+          </tab>
+        </tabset>
+
+
+      </div>
+    </div>
+  </div>

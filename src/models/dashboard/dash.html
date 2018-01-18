@@ -1,0 +1,118 @@
+<!-- <div class="hbox hbox-auto-xs hbox-auto-sm" ng-init="
+    app.settings.asideFolded = false; 
+    app.settings.asideDock = false;
+  "> -->
+  <!-- main -->
+  <div class="col">
+    <!-- main header -->
+    <div class="bg-light lter b-b wrapper-md">
+      <div class="row">
+        <div class="col-sm-6 col-xs-12">
+          <h1 class="m-n font-thin h3 text-black">Dashboard</h1>
+          <small class="text-muted">Watch Portolio Performances </small>
+        </div>
+      </div>
+    </div>
+    <!-- / main header -->
+    <div class="wrapper-md" ng-controller="FlotChartDemoCtrl">
+      <!-- stats -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="row row-sm text-center">
+            <div class="col-sm-6">
+              <div class="panel padder-v item bg-primary">
+                <div class="h3 text-white font-bold">${{depositsTotal || 0 | number:'2'}}</div>
+                <span class="text-muted text-xs">Acquisition Costs</span>
+                <div class="top text-right w-full">
+                  <i class="fa fa-caret-down text-warning m-r-sm"></i>
+                </div>   
+              </div>      
+            </div>
+            <div class="col-sm-6">
+              <div class="panel padder-v item bg-info">
+                <div class="h3 text-white font-bold">${{holdings || 0 | number:'2'}}</div>
+                <span class="text-muted text-xs">Holdings</span>
+                <div class="top text-right w-full">
+                  <i class="fa fa-caret-up text-success m-r-sm"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <a href class="block panel padder-v  item">
+                <span class="font-bold h3 block" ng-class="(profitLossPct >= 0) ?'text-success':'text-danger'">{{profitLossPct || 0 | number:2}} %</span>
+                <span class="text-muted text-xs">Profit/Loss %</span>
+                <span class="bottom text-center w-full">
+                  <!-- <span class="text-muted">{{period}}</span> -->
+                </span>
+              </a>
+            </div>
+
+            <div class="col-sm-6">
+              <a href class="block panel padder-v  item">
+                <span class="font-bold h3 block" ng-class="(profitLossAmt >= 0) ?'text-success':'text-danger'">${{profitLossAmt || 0 | number:'2'}}</span>
+                <span class="text-muted text-xs">Profit/Loss $</span>
+                <span class="bottom text-center w-full">
+                  <!-- <span class="text-muted">{{period}}</span> -->
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="panel panel-default">
+            <!-- <div class="panel-heading font-bold">Assets</div> -->
+            <div class="panel-body">
+              <canvas id="pie" class="chart chart-pie" chart-data="pie.data" chart-labels="pie.labels" chart-options="pie.options" height="90">
+              </canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-xs-12 m-b-md" style="padding: 0">
+          <div class="wrapper">
+            <div class="panel panel-default">
+              <div class="panel-heading font-bold">
+                              <!-- <span class="btn btn-default btn-xs pull-right m-t-xs" ng-click="reloadPerfomace()" style="margin-top: -3px; margin-right: -7px;">
+                                <i class="fa fa-refresh"></i>
+                              </span> -->
+
+                Performance
+              </div>
+              <div class="panel-body">
+                <div ui-jq="plot" ui-refresh="histogram.data" ui-options="
+                  [
+                    { data: {{histogram.data}}, lines: { show: true, lineWidth: 1, fill:true, fillColor: { colors: [{opacity: 0.2}, {opacity: 0.8}] } } }
+                  ], 
+                  {
+                    colors: ['{{app.color.primary}}'],
+                    series: { shadowSize: 2 },
+                    xaxis:{ show:true,  ticks: {{histogram.xaxis}}},
+                    yaxis:{ font: { color: '#a1a7ac' } },
+                    grid: { hoverable: true, clickable: true, borderWidth: 0, color: '#dce5ec' },
+                    tooltip: true,
+                    tooltipOpts: { content: '$ %y.2 on %x',  defaultTheme: false, shifts: { x: 10, y: -25 } }
+                  }" style="height:240px">
+                </div>
+                <div class="m-b-sm">
+                  <center  style="margin-top: 15px">
+                    <div class="btn-group" ng-init="radioModel = 'Day'">
+                      <label ng-click="periodFilter('Day')" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel"
+                        btn-radio="'Day'" aria-invalid="false">
+                        <i class="fa fa-check text-active"></i> Day</label>
+                      <label ng-click="periodFilter('Week')" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty active ng-valid-parse"
+                        ng-model="radioModel" btn-radio="'Week'" aria-invalid="false">
+                        <i class="fa fa-check text-active"></i> Week</label>
+                      <label ng-click="periodFilter('Month')" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel"
+                        btn-radio="'Month'" aria-invalid="false">
+                        <i class="fa fa-check text-active"></i> Month</label>
+                    </div>
+                  </center>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    <!-- </div> -->
+    <!-- / stats -->

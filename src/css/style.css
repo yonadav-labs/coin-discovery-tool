@@ -1,0 +1,18 @@
+.select-dropdown{
+    height: 500px
+}
+.coin-thumbnail{
+    float: left;
+}
+
+.assets td {
+    line-height: 45px;
+}
+
+.deposit-btn{
+    margin-top: -5px;
+}
+
+div.dataTables_paginate ul.pagination {
+    margin: 0px !important;
+}

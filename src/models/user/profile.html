@@ -1,0 +1,47 @@
+<div class="hbox hbox-auto-xs hbox-auto-sm">
+  <div class="col-md-6">
+    <div>
+      <div class="wrapper-lg bg-white-opacity">
+        <div class="row m-t">
+          <div class="col-sm-8">
+            <a href class="thumb-lg pull-left m-r">
+              <img src="img/a0.jpg" class="img-circle">
+            </a>
+            <div class="clear m-b">
+              <div class="m-b m-t-sm">
+                <span class="h3 text-black">{{user.first_name}} {{user.last_name}} </span>
+                <!-- <small class="m-l">New York, USA</small> -->
+              </div>
+              <a href class="btn btn-sm btn-info btn-rounded">Edit</a>
+            </div>
+        </div>
+        
+   <div class="padder">      
+      <div class="col-sm-12 connected" ui-jq="sortable" ui-options="{items:'.panel', handle:'.panel-heading', connectWith:'.connected'}">
+      <div class="panel panel-default">
+        <div class="list-group bg-white">
+          <a href class="list-group-item">
+            <i class="fa fa-fw fa-envelope"></i> {{user.email}}
+          </a>
+        
+          <a href class="list-group-item">
+            <i class="fa fa-fw fa-phone"></i> {{user.phone}}
+          </a>
+          <a href class="list-group-item">
+            <i class="fa fa-fw fa-map-marker"></i> {{user.phone}}
+          </a>
+          <a href class="list-group-item">
+            <i class="fa fa-fw fa-bell"></i> Notifications
+          </a>
+        </div>
+      </div>
+    </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+   
+  </div>
+
+</div>

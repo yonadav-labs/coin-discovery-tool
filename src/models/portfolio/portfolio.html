@@ -1,0 +1,256 @@
+<style>
+  .paging .pagination{margin: 0;margin-right: 15px;}
+</style>
+<div class="bg-light lter b-b wrapper-md">
+
+  <h1 class="m-n font-thin h3">
+    <button ng-show="showForm" type="button" ng-click="cancelEditAsset()" class="btn btn-sm btn-primary">Back</button>
+    Assets
+  </h1>
+
+</div>
+<div class="wrapper-md">
+  <div class="row">
+    <div class="col-xs-12" ng-show="!showForm">
+      <tabset class="tab-container">
+        <tab>
+          <tab-heading>
+            <i class="icon-diamond "></i> Asset
+          </tab-heading>
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <span class="btn btn-default btn-xs pull-right m-t-xs" ng-click="reloadAsset()" style="margin-top: -3px; margin-right: -7px;">
+                <i class="fa fa-refresh"></i>
+              </span>
+              <span class="btn btn-primary btn-xs pull-right m-t-xs" ng-click="addAnAsset()" style="margin-top: -3px; margin-right: 7px;">
+              Add Asset</span>
+              Assets
+            </div>
+            <!-- <table datatable="ng" dt-options="datatableOptions" class="table table-striped m-b-none"> -->
+            <table class="table table-striped m-b-none">
+              <thead>
+                <tr>
+                  <!-- <th>#</th> -->
+                  <th>Coin</th>
+                  <th>Quantity</th>
+                  <th>Current Price</th>
+                  <th>Net Cost</th>
+                  <th>Current Value</th>
+                  <th>Profit/Loss $</th>
+                  <th>Profit/Loss %</th>
+                  <th>Purchase Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr dir-paginate="asset in assets | itemsPerPage: 10" pagination-id="asset">
+                  <td>
+                    {{asset.name}}
+                  </td>
+                  <td>
+                     {{asset.amount || 0 | number:'4'}}
+                     </td>
+                  <td>
+                    <strong style="display: block">${{asset.market_price || 0 | number:'2'}}</strong>
+                    <!-- <small ng-if="asset.currency_val">{{asset.currency}} {{asset.currency_val | number:'2'}}</small>                     -->
+                  </td>
+                  <td>
+                    <span style="display: block" ng-if="!asset.buy_priceUSD">${{asset.buy_price || 0 | number:'2'}}</span>
+                    <span ng-if="asset.buy_priceUSD">${{asset.buy_priceUSD || 0 | number:'2'}}</span>
+                  </td>
+                  <td>
+                    <strong style="display: block">${{asset.total_value || 0 | number:'2'}}</strong>
+                  </td>
+
+
+                  <td>
+                    <span ng-class="(asset.profit_loss_amt >= 0) ?'text-success':'text-danger'">${{asset.profit_loss_amt || 0 | number:'2'}}</span>
+                  </td>
+                  <td>
+                    <i class="fa m-r-sm" ng-class="(asset.profit_loss_pct >= 0) ?'text-success fa-caret-up':'text-danger fa-caret-down'"></i>
+                    <strong ng-class="(asset.profit_loss_pct >= 0) ?'text-success':'text-danger'">
+                      {{asset.profit_loss_pct || 0 | number:'2'}}%
+                    </strong>
+                  </td>
+
+                  <td>{{asset.transaction_date | date:'MM-dd-yyyy'}}</td>
+                  <td>
+                    <a href="javascript:void(0)" ng-click="sellAnAsset(asset)" title="sell" style="margin-right:10px;">
+                      <i class="icon-share-alt text-success"></i>
+                    </a>
+
+                    <a href="javascript:void(0)" ng-click="editAnAsset(asset)" title="edit" style="margin-right:10px;">
+                      <i class="icon-pencil text-primary"></i>
+                    </a>
+
+                    <a href="javascript:void(0)" ng-click="deleteAnAsset(asset)" title="delete">
+                      <i class="icon-trash text-danger"></i>
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="row">
+            <dir-pagination-controls boundary-links="true" pagination-id="asset" class="paging pull-right" template-url="libs/paging/dirPagination.tpl.html"></dir-pagination-controls>
+          </div>
+        </tab>
+
+        <tab>
+          <tab-heading>
+            <i class="icon-share-alt"></i> Sold
+          </tab-heading>
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <span class="btn btn-default btn-xs pull-right m-t-xs" ng-click="reloadSoldAsset()" style="margin-top: -3px; margin-right: -7px;">
+                <i class="fa fa-refresh"></i>
+              </span>
+              Sold Assets
+            </div>
+            <table  class="table table-striped m-b-none">
+              <thead>
+                <tr>
+                  <!-- <th>#</th> -->
+                  <th>Coin</th>
+                  <th>Quantity</th>
+                  <th>Current Price</th>
+                  <th>Sell Price</th>
+                  <th>Current Value</th>
+                  <th>Profit/Loss $</th>
+                  <th>Profit/Loss %</th>
+                  <th>Purchase Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr dir-paginate="asset in soldAssets | itemsPerPage: 10" pagination-id="soldAsset">
+                  <!-- <td width="40">
+                    <img width="25px" height="25px" ng-src="{{baseUrl}}{{asset.image_url}}" alt="{{asset.symbol}}_img" class="coin-thumbnail">
+                  </td> -->
+                  <td>
+                    <!-- <img width="20px" height="20px" ng-src="{{baseUrl}}{{asset.image_url}}" alt="{{symbol}}_img" class="coin-thumbnail"> -->
+                    {{asset.name}}
+                  </td>
+                  <td>{{asset.amount || 0 | number:'8'}}</td>
+
+                  <td>
+                   <td>
+                    <strong>${{asset.market_price | number:'2'}}</strong>
+                  </td>
+                    <span>${{asset.sell_price || 0 | number:'2'}}</span>
+                    <!-- <span ng-if="asset.sell_priceUSD">${{asset.sell_priceUSD || 0 | number:'2'}}</span> -->
+                    
+                  </td>
+ 
+                  <td>
+                    <strong>${{asset.total_value | number:'2'}}</strong>
+                  </td>
+                 <td>
+                    <span ng-class="(asset.profit_loss_amt >= 0) ?'text-success':'text-danger'">${{asset.profit_loss_amt || 0 | number:'2'}}</span>
+                  </td>
+                  <td>
+                    <i class="fa m-r-sm" ng-class="(asset.profit_loss_pct >= 0) ?'text-success fa-caret-up':'text-danger fa-caret-down'"></i>
+                    <strong ng-class="(asset.profit_loss_pct >= 0) ?'text-success':'text-danger'">
+                      {{asset.profit_loss_pct || 0 | number:'2'}}%
+                    </strong>
+                  </td>
+
+
+                  <td>
+                     {{asset.transaction_date |  date:'MM-dd-yyyy'}}</td>
+                  <!-- <td>{{asset.modified | date:'yyyy-MM-dd'}}</td> -->
+                  <td>
+
+                    <!-- <a href="javascript:void(0)" ng-click="sellAnAsset(asset)" title="sell" style="margin-right:10px;">
+                      <i class="icon-share-alt text-success"></i>
+                    </a> -->
+                    <a href="javascript:void(0)" ng-click="editSoldAsset(asset)" title="edit" style="margin-right:10px;">
+                      <i class="icon-pencil text-primary"></i>
+                    </a>
+                    <a href="javascript:void(0)" ng-click="deleteSoldAsset(asset)" title="delete">
+                      <i class="icon-trash text-danger"></i>
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="row">
+            <dir-pagination-controls boundary-links="true" pagination-id="soldAsset" class="paging pull-right" template-url="libs/paging/dirPagination.tpl.html"></dir-pagination-controls>
+          </div>
+        </tab>
+      </tabset>
+
+    </div>
+    <div class="col-md-5" style=" float: none; margin: 0 auto;" ng-show="showForm">
+      <div class="panel panel-default">
+        <div class="panel-heading font-bold">Asset Form</div>
+        <div class="panel-body">
+          <form role="form" name="assetForm" novalidate>
+            <div class="form-group">
+              <label class="control-label">Coins</label>
+              <div class="">
+                <!-- <select name="account" class="form-control m-b">
+                      <option ng-repeat="coin in coins">{{coin.CoinName}}</option>
+                    </select> -->
+                <oi-select oi-options="coin.CoinName for coin in coins track by $index" name="coin" ng-disabled="sellMode" required ng-model="postData.coin"
+                  placeholder="Coin"></oi-select>
+              </div>
+            </div>
+            <div class="form-group col-xs-6" style="padding-left:0">
+              <label>{{sellMode?'Sell':'Buy'}} price</label>
+              <input type="text" ng-model="postData.id" class="hidden">
+              <input type="text" ng-model="postData.purchase_price" class="hidden">
+              <input type="text" ng-model="postData.buy_price" class="hidden">
+              <input type="number" ng-model="postData.price" class="form-control" name="price" placeholder="{{sellMode?'Sell':'Buy'}} price"
+                required>
+            </div>
+            <div class="form-group col-xs-6" style="padding-right: 0">
+              <label>Amount</label>
+              <input type="number" ng-model="postData.amount" class="form-control" name="amount" placeholder="Amount" required>
+            </div>
+
+            <div class="form-group col-xs-6" style="padding-left:0">
+              <label>Currency</label>
+              <select class="form-control" name="currency" ng-model="postData.currency" required>
+                <option value="USD" selected="selected">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="BTC">BTC</option>
+                <option value="ETH">ETH</option>
+                <option value="LTC">LTC</option>
+              </select>
+            </div>
+            <div class="form-group col-xs-6" style="padding-right: 0">
+              <label>Price Type</label>
+              <select class="form-control" name="currency" ng-model="postData.price_type" required>
+                <option value="perUnit" selected="selected">Per Unit</option>
+                <option value="totalValue">Total Value</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Transaction Date</label>
+              <p class="input-group">
+                <input type="text" class="form-control" datepicker-popup="dd-MM-yyyy" ng-model="postData.transaction_date" is-open="date_opened"
+                  datepicker-options="dateOptions" ng-required="true" close-text="Close" />
+                <span class="input-group-btn">
+                  <button type="button" class="btn btn-default" ng-click="open($event)">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                  </button>
+                </span>
+              </p>
+            </div>
+            <div class="form-group">
+              <label for="note">Note</label>
+              <textarea name="note" ng-model="postData.note" id="note" name="note" class="form-control" placeholder="Note" cols="30" rows="10">
+          </textarea>
+            </div>
+            <button type="submit" ng-click="submitAsset()" class="btn btn-sm btn-primary" ng-disabled="assetForm.$invalid">Submit</button>
+            <button type="submit" ng-click="cancelEditAsset()" class="btn btn-sm btn-default">Cancel</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
