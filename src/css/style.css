@@ -16,3 +16,9 @@
 div.dataTables_paginate ul.pagination {
     margin: 0px !important;
 }
+
+
+
+a[href="http://www.amcharts.com/javascript-charts/"]{
+  display: none !important;
+}

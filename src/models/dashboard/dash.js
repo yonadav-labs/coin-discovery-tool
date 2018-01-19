@@ -51,7 +51,16 @@ app.controller('DashCtrl',
                         "volume": growthData[i].value
                     } );
                 }
-                console.log(chartData);
+                var stockEvents = [];
+                var stockEvents = $scope.assets.map((data) => {
+                    return {
+                        "date": new Date(data.transaction_date),
+                        "type": "sign",
+                        "graph": "g1",
+                        "text": data.symbol,
+                        "description": "Invested $" + data.purchase_price + ' in ' + data.amount +' ' + data.symbol
+                    }
+                });
                 var chart = AmCharts.makeChart( "chart-growth", {
                     "type": "stock",
                     "theme": "light",
@@ -67,14 +76,7 @@ app.controller('DashCtrl',
                         "dataProvider": chartData,
                         "categoryField": "date",
                         // EVENTS
-                        "stockEvents": [ {
-                            "date": new Date( 2018, 1, 18 ),
-                            "type": "sign",
-                            "backgroundColor": "#85CDE6",
-                            "graph": "g1",
-                            "text": "S",
-                            "description": "This is description of an event"
-                        }]
+                        "stockEvents": stockEvents
                     }],
 
 
