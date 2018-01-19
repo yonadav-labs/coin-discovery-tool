@@ -108,7 +108,34 @@
           </div>
         </div>
         <!-- END PORTLET-->
-    </div>
+      </div>
+
+
+      <div class="wrapper">
+        <div class="panel panel-default">
+          <div class="panel-heading font-bold">
+              <span class="btn btn-default btn-xs pull-right m-t-xs"  style="margin-top: -3px; margin-right: -7px;">
+                <i class="fa fa-refresh"></i>
+              </span>
+            Growth
+          </div>
+          <div class="panel-body">
+            <div style="text-align:center" ng-if="loadingGrowthData" class="col-sm-12">
+              <i class="fa fa-spin fa-spinner"></i>
+                Loading Data
+            </div>
+
+            <div id="chart-growth" class ="col-sm-12" style="height:400px;padding:0px 30px">
+            </div>
+            <div class="m-b-sm">
+              <center  style="margin-top: 15px">
+
+              </center>
+            </div>
+          </div>
+        </div>
+        <!-- END PORTLET-->
+      </div>
   </div>
     <!-- </div> -->
     <!-- / stats -->

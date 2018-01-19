@@ -39,6 +39,102 @@ app.controller('DashCtrl',
                 }
             };
 
+
+            $scope.drawGrowthChart = function(growthData, minPeriod) {
+
+                var chartData = [];
+
+                for ( var i = 0; i < growthData.length; i++ ) {
+                    chartData.push( {
+                        "date": growthData[i].date,
+                        "value": growthData[i].value,
+                        "volume": growthData[i].value
+                    } );
+                }
+                console.log(chartData);
+                var chart = AmCharts.makeChart( "chart-growth", {
+                    "type": "stock",
+                    "theme": "light",
+                    "dataSets": [ {
+                        "color": "#b0de09",
+                        "fieldMappings": [ {
+                            "fromField": "value",
+                            "toField": "value"
+                            }, {
+                            "fromField": "volume",
+                            "toField": "volume"
+                        } ],
+                        "dataProvider": chartData,
+                        "categoryField": "date",
+                        // EVENTS
+                        "stockEvents": [ {
+                            "date": new Date( 2018, 1, 18 ),
+                            "type": "sign",
+                            "backgroundColor": "#85CDE6",
+                            "graph": "g1",
+                            "text": "S",
+                            "description": "This is description of an event"
+                        }]
+                    }],
+
+
+                  "panels": [ {
+                    "title": "Value",
+                    "stockGraphs": [ {
+                      "id": "g1",
+                      "valueField": "value"
+                    } ],
+                    "stockLegend": {
+                      "valueTextRegular": " ",
+                      "markerType": "none"
+                    }
+                  } ],
+
+                  "chartScrollbarSettings": {
+                    "graph": "g1"
+                  },
+
+                  "chartCursorSettings": {
+                    "valueBalloonsEnabled": true,
+                    "graphBulletSize": 1,
+                    "valueLineBalloonEnabled": true,
+                    "valueLineEnabled": true,
+                    "valueLineAlpha": 0.5
+                  },
+
+                  "periodSelector": {
+                    "periods": [ {
+                      "period": "DD",
+                      "count": 10,
+                      "label": "10 days"
+                    }, {
+                      "period": "MM",
+                      "count": 1,
+                      "label": "1 month"
+                    }, {
+                      "period": "YYYY",
+                      "count": 1,
+                      "label": "1 year"
+                    }, {
+                      "period": "YTD",
+                      "label": "YTD"
+                    }, {
+                      "period": "MAX",
+                      "label": "MAX"
+                    } ]
+                  },
+
+                  "panelsSettings": {
+                    "usePrefixes": true
+                  },
+                  "export": {
+                    "enabled": true
+                  }
+                });
+                chart.validateData();
+            }
+
+
             $scope.drawChart = function(dataSets, minPeriod) {
                 var chart = AmCharts.makeChart( "chart-user", {
                     "type": "stock",
@@ -265,40 +361,9 @@ app.controller('DashCtrl',
 
 
             $scope.getHistoryWeek = () => {
-                // Utill.startLoader();
-                // $scope.loadingData = true;
-                // var coinSymbols = $scope.assets.map((data) => data.symbol);
-                
-                // var promises = [];
-                // coinSymbols.map(function(symbol){
-                //     for (var d = 1; d <= 7; d ++ ){
-                //         var date = moment().subtract('day', d).unix();
-                //         promises.push(CorsRequest.get(`data/pricehistorical?fsym=${symbol}&tsyms=USD&ts=${Math.round(date)}`));    
-                //     }
-                    
-                // });
-                // $q.all(promises).then(function(res){
-                    
-                //     $scope.loadingData = false;
-                //     $scope.rawChartData = res.map(function(r){ 
-                //         var assetname = r.config.url;
-                //         assetname = assetname.slice(assetname.indexOf('fsym'));
-                //         assetname = assetname.slice(0, assetname.indexOf('&'));
-                //         assetname = assetname.slice(5);
-                //         var ts = r.config.url;
-                //         ts = ts.slice(ts.indexOf('&ts='));
-                //         ts = ts.slice(4);
-                //         return {...r.data, asset: assetname, ts: ts}; 
-                //     });
-                //     var dataSets = $scope.generateDataSetsForHistory();
-                //     $scope.drawChart(dataSets, 'DD');
-                //     Utill.endLoader()
-                // }, (res) => {
-                //     console.log('error', res);
-                // })
                 $scope.loadingData = true;
                 var coinSymbols = $scope.getUniqueAssets();
-                
+
                 $q.all(coinSymbols.map(function(symbol){
                     return CorsRequest.get(`data/histohour?fsym=${symbol}&tsym=USD&limit=150`);    
                 })).then(function(res){
@@ -315,11 +380,6 @@ app.controller('DashCtrl',
                     var dataSets = $scope.generateDataSets();
                     $scope.drawChart(dataSets, 'ss');
 
-                    // $scope.histogram.data = $scope.calcPerformance(res.data.Data);                    
-                    // $scope.histogram.xaxis = $scope.getxAxis($scope.histogram.data, 'HH:mm');
-                    // $scope.$watchCollection('histogram', function (nData, oData) {
-                    //     $scope.histogram = nData;
-                    // });
                     Utill.endLoader();
                 }, (res) => {
                     console.log('error', res);
@@ -328,18 +388,7 @@ app.controller('DashCtrl',
             };
 
             $scope.getHistoryDay = () => {
-
-                CorsRequest.get(`data/histominute?fsym=BTC&tsym=USD&limit=300`)
-                .then(function(res){
-
-                    $scope.histogram.data = $scope.calcPerformance(res.data.Data);
-                    $scope.histogram.xaxis = $scope.getxAxis($scope.histogram.data, 'HH:mm');
-                    $scope.$watchCollection('histogram', function (nData, oData) {
-                        $scope.histogram = nData;
-                    });
-                });
-
-                
+                $scope.getGrowsGraph();
                 // Utill.startLoader();
                 $scope.loadingData = true;
                 var coinSymbols = $scope.getUniqueAssets();
@@ -357,9 +406,11 @@ app.controller('DashCtrl',
                         return {...r.data, asset: assetname}; 
                     });
 
+
                     var dataSets = $scope.generateDataSets();
                     $scope.drawChart(dataSets, 'ss');
-
+                    
+                    
                     // $scope.histogram.data = $scope.calcPerformance(res.data.Data);                    
                     // $scope.histogram.xaxis = $scope.getxAxis($scope.histogram.data, 'HH:mm');
                     // $scope.$watchCollection('histogram', function (nData, oData) {
@@ -372,7 +423,68 @@ app.controller('DashCtrl',
                 })
             };
 
+            $scope.getGrowsGraph = function() {
+
+                var coinSymbols = $scope.getUniqueAssets();
+                $q.all(coinSymbols.map(function(symbol){
+                    return CorsRequest.get(`data/histoday?fsym=${symbol}&tsym=USD&limit=200`);    
+                })).then(function(res){
+                    
+                    $scope.loadingData = false;
+                    $scope.rawChartData = res.map(function(r){ 
+                        var assetname = r.config.url;
+                        assetname = assetname.slice(assetname.indexOf('fsym'));
+                        assetname = assetname.slice(0, assetname.indexOf('&'));
+                        assetname = assetname.slice(5);
+                        return {...r.data, asset: assetname}; 
+                    });
+
+                    var priceByTime = {};
+                    $scope.rawChartData.map((item) => {
+
+                        item.Data.map((ii)=>{
+                            if(!priceByTime[item.asset])
+                                priceByTime[item.asset] = [];
+                            priceByTime[item.asset].push({
+                                time: moment.unix(ii.time).format('YYYY-MM-DD'),
+                                high: ii.high,
+                                low: ii.low,
+                                open: ii.open,
+                                close: ii.close,
+                                volumefrom: ii.volumefrom,
+                                volumeto: ii.volumeto
+                            });                            
+                        })
+                    });
+
+                    var growthData = [];
+                    for( var i = 0 ; i < priceByTime[Object.keys(priceByTime)[0]].length; i++){
+                        var time = priceByTime[Object.keys(priceByTime)[0]][i].time;
+                        var initDepositDate = moment(time);
+                        var thisDayAssets = $scope.assets.filter((asset)=>{
+                            var timeDiff = moment(asset.transaction_date).isSameOrAfter(initDepositDate);
+                            if (timeDiff) {
+                                return false;
+                            } else {
+                                return true;
+                            }
+                        });
+                        var dayTotal = 0;
+                        thisDayAssets.forEach(function (val, idx) { 
+                            market_price = priceByTime[val.symbol][i].close;
+                            dayTotal += +val.amount * market_price; 
+                        });
+
+                        growthData.push({
+                            date: time,
+                            value: dayTotal
+                        });
+                    }
+                    $scope.drawGrowthChart(growthData, 'dd');
+                });
+            }
             
+
             $scope.calcPerformance = (data) => {
                 var holding = 0;
                 $scope.percentageDifference = 0;
