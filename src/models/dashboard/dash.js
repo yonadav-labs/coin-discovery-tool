@@ -1,6 +1,6 @@
 app.controller('DashCtrl',
-    ['$scope', '$stateParams', '$state', '$interval', '$rootScope', 'UserService', 'Request', 'CorsRequest', '$localStorage', 'Utill',
-        function ($scope, $stateParams, $state, $interval, $rootScope, UserService, Request, CorsRequest, $localStorage, Utill) {
+    ['$scope', '$stateParams', '$state', '$interval', '$rootScope', 'UserService', 'Request', 'CorsRequest', '$localStorage', 'Utill', '$q',
+        function ($scope, $stateParams, $state, $interval, $rootScope, UserService, Request, CorsRequest, $localStorage, Utill, $q) {
 
             $scope.postData = {};
             $scope.errors = [];
@@ -9,8 +9,8 @@ app.controller('DashCtrl',
             $scope.showPhoneForm = false;
             $scope.depositsTotal = 0;
             $scope.histogram = { data: [], xaxis: [] };
-
-            $scope.pie = {
+            $scope.loadingData = false;
+            $scope.pie = {  
                 labels: [],
                 data: [],
                 options: {
@@ -39,6 +39,148 @@ app.controller('DashCtrl',
                 }
             };
 
+            $scope.drawChart = function(dataSets, minPeriod) {
+                var chart = AmCharts.makeChart( "chart-user", {
+                    "type": "stock",
+                    "hideCredits":true,
+
+                    "theme": "light",  
+                    "dataSets": dataSets,
+
+                    "panels": [ {
+                        "title": "Value",
+                        "stockGraphs": [ {
+                            "id": "g1",
+                            "valueField": "value",
+                            "comparable": true,
+                            "compareField": "value",
+                            "balloonText": "[[title]]:<b>[[value]]</b>",
+                            "compareGraphBalloonText": "[[title]]:<b>[[value]]</b>"
+                        } ],
+                        "stockLegend": {
+                            "valueTextRegular": " ",
+                            "markerType": "none",
+                            "periodValueTextComparing": "[[percents.value.close]]%",
+                            "periodValueTextRegular": "[[value.close]]"
+                        },
+
+                        "valueAxes": [ {
+                            "id": "v1",
+                            "dashLength": 5
+                        } ],
+
+                        "categoryAxis": {
+                            "dashLength": 5
+                        },
+                    },],
+
+                    "chartScrollbarSettings": {
+                        "graph": "g1",
+                        "graphType": "line",
+                        "usePeriod": "WW"
+                    },
+
+
+                    "chartCursorSettings": {
+                        "valueBalloonsEnabled": true,
+                        "graphBulletSize": 1,
+                        "valueLineBalloonEnabled": true,
+                        "valueLineEnabled": true,
+                        "valueLineAlpha": 0.5
+                    },
+
+                    "categoryAxesSettings": {
+                        "minPeriod": minPeriod,
+                        "equalSpacing": true,
+                        "startOnAxis": true
+                    },
+
+                      "dataSetSelector": {
+                        "position": "top"
+                      },
+
+
+                    "export": {
+                    "enabled": true
+                    },
+                } );
+                chart.validateData();
+            }
+
+
+
+            $scope.generateDataSetsForHistory = function () {
+                var dataSets = [];
+                var data = {};
+                $scope.rawChartData.map(function(item){
+                    if(item.Response == 'Error')
+                        return;
+                    if(!data[item.asset])
+                        data[item.asset] = [];
+                    data[item.asset].push({
+                        "date": new Date(+item.ts * 1000),
+                        "value": item[item.asset].USD,
+                        "volume": Math.round( Math.random() * 22 )
+                    });
+                    
+                })
+                
+                for (key in data){
+                    var temp = data[key].sort(function(t1, t2){
+                        return t1.date > t2.date;
+                    })
+                    dataSets.push({
+                        "fieldMappings": [ {
+                          "fromField": "value",
+                          "toField": "value"
+                        }, {
+                          "fromField": "volume",
+                          "toField": "volume"
+                        } ],
+
+                        "dataProvider": data[key],
+                        "categoryField": "date",
+                        "title": key,
+                        "compared": false,
+                        "showInCompare": false,
+                    })
+                }
+                return dataSets;
+            }
+
+            $scope.generateDataSets = function() {
+                var dataSets = [];
+                chartData = $scope.rawChartData.map(function(item){
+                    var chartData = [];
+                    chartData = item.Data.map(function(item){
+                        return {
+                            // "date": moment(item.time).format('YY-MM-DD HH-MM-SS'),
+                            "date": new Date(+item.time *1000),
+                            "value": item.close,
+                            "volume": Math.round( Math.random() * 22 )
+                        };
+                    });
+
+                    return {
+                        "fieldMappings": [ {
+                          "fromField": "value",
+                          "toField": "value"
+                        }, {
+                          "fromField": "volume",
+                          "toField": "volume"
+                        } ],
+
+                        "dataProvider": chartData,
+                        "categoryField": "date",
+                        "title": item.asset,
+                        "compared": false,
+                        "showInCompare": false,
+                    }
+                })
+                return chartData;
+            }
+    
+
             $scope.periodFilter = (period) => {
                 switch (period) {
                     case 'Day':
@@ -58,41 +200,171 @@ app.controller('DashCtrl',
             };
 
             $scope.getHistoryMonth = () => {
-                CorsRequest.get('data/histoday?fsym=BTC&tsym=USD').then((res) => {
-                    $scope.histogram.data = $scope.calcPerformance(res.data.Data, $scope.totalAmtInBTC);                    
-                    $scope.histogram.xaxis = $scope.getxAxis($scope.histogram.data, 'MMM DD');
-                    $scope.$watchCollection('histogram', function (nData, oData) {
-                        $scope.histogram = nData;
+                // Utill.startLoader();
+                // $scope.loadingData = true;
+                // var coinSymbols = $scope.assets.map((data) => data.symbol);
+                
+                // var promises = [];
+                // coinSymbols.map(function(symbol){
+                //     for (var d = 1; d <= 30; d ++ ){
+                //         var date = moment().subtract('day', d).unix();
+                //         promises.push(CorsRequest.get(`data/pricehistorical?fsym=${symbol}&tsyms=USD&ts=${Math.round(date)}`));    
+                //     }
+                    
+                // });
+                // $q.all(promises).then(function(res){
+                    
+                //     $scope.loadingData = false;
+                //     $scope.rawChartData = res.map(function(r){ 
+                //         var assetname = r.config.url;
+                //         assetname = assetname.slice(assetname.indexOf('fsym'));
+                //         assetname = assetname.slice(0, assetname.indexOf('&'));
+                //         assetname = assetname.slice(5);
+                //         var ts = r.config.url;
+                //         ts = ts.slice(ts.indexOf('&ts='));
+                //         ts = ts.slice(4);
+                //         return {...r.data, asset: assetname, ts: ts}; 
+                //     });
+                //     var dataSets = $scope.generateDataSetsForHistory();
+                //     $scope.drawChart(dataSets, 'DD');
+                //     Utill.endLoader()
+                // }, (res) => {
+                //     console.log('error', res);
+                // })
+
+                $scope.loadingData = true;
+                var coinSymbols = $scope.getUniqueAssets();
+                
+                $q.all(coinSymbols.map(function(symbol){
+                    return CorsRequest.get(`data/histohour?fsym=${symbol}&tsym=USD&limit=700`);    
+                })).then(function(res){
+                    
+                    $scope.loadingData = false;
+                    $scope.rawChartData = res.map(function(r){ 
+                        var assetname = r.config.url;
+                        assetname = assetname.slice(assetname.indexOf('fsym'));
+                        assetname = assetname.slice(0, assetname.indexOf('&'));
+                        assetname = assetname.slice(5);
+                        return {...r.data, asset: assetname}; 
                     });
+
+                    var dataSets = $scope.generateDataSets();
+                    $scope.drawChart(dataSets, 'ss');
+
+                    // $scope.histogram.data = $scope.calcPerformance(res.data.Data);                    
+                    // $scope.histogram.xaxis = $scope.getxAxis($scope.histogram.data, 'HH:mm');
+                    // $scope.$watchCollection('histogram', function (nData, oData) {
+                    //     $scope.histogram = nData;
+                    // });
                     Utill.endLoader();
                 }, (res) => {
                     console.log('error', res);
+                    Utill.endLoader();
                 })
             };
 
 
             $scope.getHistoryWeek = () => {
-                CorsRequest.get('data/histoday?fsym=BTC&tsym=USD&limit=7').then((res) => {
-                    $scope.histogram.data = $scope.calcPerformance(res.data.Data, $scope.totalAmtInBTC);                    
-                    $scope.histogram.xaxis = $scope.getxAxis($scope.histogram.data, 'MMM DD');
-                    $scope.$watchCollection('histogram', function (nData, oData) {
-                        $scope.histogram = nData;
+                // Utill.startLoader();
+                // $scope.loadingData = true;
+                // var coinSymbols = $scope.assets.map((data) => data.symbol);
+                
+                // var promises = [];
+                // coinSymbols.map(function(symbol){
+                //     for (var d = 1; d <= 7; d ++ ){
+                //         var date = moment().subtract('day', d).unix();
+                //         promises.push(CorsRequest.get(`data/pricehistorical?fsym=${symbol}&tsyms=USD&ts=${Math.round(date)}`));    
+                //     }
+                    
+                // });
+                // $q.all(promises).then(function(res){
+                    
+                //     $scope.loadingData = false;
+                //     $scope.rawChartData = res.map(function(r){ 
+                //         var assetname = r.config.url;
+                //         assetname = assetname.slice(assetname.indexOf('fsym'));
+                //         assetname = assetname.slice(0, assetname.indexOf('&'));
+                //         assetname = assetname.slice(5);
+                //         var ts = r.config.url;
+                //         ts = ts.slice(ts.indexOf('&ts='));
+                //         ts = ts.slice(4);
+                //         return {...r.data, asset: assetname, ts: ts}; 
+                //     });
+                //     var dataSets = $scope.generateDataSetsForHistory();
+                //     $scope.drawChart(dataSets, 'DD');
+                //     Utill.endLoader()
+                // }, (res) => {
+                //     console.log('error', res);
+                // })
+                $scope.loadingData = true;
+                var coinSymbols = $scope.getUniqueAssets();
+                
+                $q.all(coinSymbols.map(function(symbol){
+                    return CorsRequest.get(`data/histohour?fsym=${symbol}&tsym=USD&limit=150`);    
+                })).then(function(res){
+                    
+                    $scope.loadingData = false;
+                    $scope.rawChartData = res.map(function(r){ 
+                        var assetname = r.config.url;
+                        assetname = assetname.slice(assetname.indexOf('fsym'));
+                        assetname = assetname.slice(0, assetname.indexOf('&'));
+                        assetname = assetname.slice(5);
+                        return {...r.data, asset: assetname}; 
                     });
-                    Utill.endLoader()
+
+                    var dataSets = $scope.generateDataSets();
+                    $scope.drawChart(dataSets, 'ss');
+
+                    // $scope.histogram.data = $scope.calcPerformance(res.data.Data);                    
+                    // $scope.histogram.xaxis = $scope.getxAxis($scope.histogram.data, 'HH:mm');
+                    // $scope.$watchCollection('histogram', function (nData, oData) {
+                    //     $scope.histogram = nData;
+                    // });
+                    Utill.endLoader();
                 }, (res) => {
                     console.log('error', res);
+                    Utill.endLoader();
                 })
             };
 
             $scope.getHistoryDay = () => {
-                // Utill.startLoader();
-                CorsRequest.get('data/histohour?fsym=BTC&tsym=USD&limit=23').then((res) => {
-                    console.log(res.data)
-                    $scope.histogram.data = $scope.calcPerformance(res.data.Data);                    
+
+                CorsRequest.get(`data/histominute?fsym=BTC&tsym=USD&limit=300`)
+                .then(function(res){
+
+                    $scope.histogram.data = $scope.calcPerformance(res.data.Data);
                     $scope.histogram.xaxis = $scope.getxAxis($scope.histogram.data, 'HH:mm');
                     $scope.$watchCollection('histogram', function (nData, oData) {
                         $scope.histogram = nData;
                     });
+                });
+
+                
+                // Utill.startLoader();
+                $scope.loadingData = true;
+                var coinSymbols = $scope.getUniqueAssets();
+                
+                $q.all(coinSymbols.map(function(symbol){
+                    return CorsRequest.get(`data/histohour?fsym=${symbol}&tsym=USD&limit=24`);    
+                })).then(function(res){
+                    
+                    $scope.loadingData = false;
+                    $scope.rawChartData = res.map(function(r){ 
+                        var assetname = r.config.url;
+                        assetname = assetname.slice(assetname.indexOf('fsym'));
+                        assetname = assetname.slice(0, assetname.indexOf('&'));
+                        assetname = assetname.slice(5);
+                        return {...r.data, asset: assetname}; 
+                    });
+
+                    var dataSets = $scope.generateDataSets();
+                    $scope.drawChart(dataSets, 'ss');
+
+                    // $scope.histogram.data = $scope.calcPerformance(res.data.Data);                    
+                    // $scope.histogram.xaxis = $scope.getxAxis($scope.histogram.data, 'HH:mm');
+                    // $scope.$watchCollection('histogram', function (nData, oData) {
+                    //     $scope.histogram = nData;
+                    // });
                     Utill.endLoader();
                 }, (res) => {
                     console.log('error', res);
@@ -185,6 +457,13 @@ app.controller('DashCtrl',
                 })
             };
 
+            $scope.getUniqueAssets = () => {
+                function onlyUnique(value, index, self) { 
+                    return self.indexOf(value) === index;
+                }
+                return $scope.assets.map(a=>a.symbol).filter( onlyUnique ); // returns ['a', 1, 2, '1']
+            };
+
             $scope.getAssets = () => {
                 Utill.startLoader();
                 Request.get('assets/').then((res) => {
@@ -192,7 +471,7 @@ app.controller('DashCtrl',
                         Utill.endLoader();
                         return 0;
                     };
-                    // $scope.initDepositDate = moment(res.data[res.data.length - 1].transaction_date).format('YYYY-MM-DD');
+                    $scope.initDepositDate = moment(res.data[res.data.length - 1].transaction_date);
                     // $scope.depositsTotal = res.data.reduce((total, asset) => {
                     //     return +total + (+asset.amount * +asset.buy_price);
                     // }, 0);
