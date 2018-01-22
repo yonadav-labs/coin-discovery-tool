@@ -13,7 +13,7 @@ angular.module('app')
 
       // config
       $scope.app = {
-        name: 'Mutual Coin Fund',
+        name: 'Coin Trends',
         version: '1.0.0',
         // for chart colors
         color: {
