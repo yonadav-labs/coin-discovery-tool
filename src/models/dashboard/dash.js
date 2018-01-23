@@ -193,13 +193,13 @@ app.controller('DashCtrl',
                         "startOnAxis": true
                     },
 
-                      "dataSetSelector": {
+                    "dataSetSelector": {
                         "position": "top"
-                      },
+                    },
 
 
                     "export": {
-                    "enabled": true
+                        "enabled": true
                     },
                 } );
                 chart.validateData();
@@ -331,34 +331,35 @@ app.controller('DashCtrl',
                 // })
 
                 $scope.loadingData = true;
-                var coinSymbols = $scope.getUniqueAssets();
+                $scope.getUniqueAssets().then(function(coinSymbols) {
+                    $q.all(coinSymbols.map(function(symbol){
+                        return CorsRequest.get(`data/histohour?fsym=${symbol}&tsym=USD&limit=700`);    
+                    })).then(function(res){
+                        
+                        $scope.loadingData = false;
+                        $scope.rawChartData = res.map(function(r){ 
+                            var assetname = r.config.url;
+                            assetname = assetname.slice(assetname.indexOf('fsym'));
+                            assetname = assetname.slice(0, assetname.indexOf('&'));
+                            assetname = assetname.slice(5);
+                            return {...r.data, asset: assetname}; 
+                        });
+
+                        var dataSets = $scope.generateDataSets();
+                        $scope.drawChart(dataSets, 'ss');
+
+                        // $scope.histogram.data = $scope.calcPerformance(res.data.Data);                    
+                        // $scope.histogram.xaxis = $scope.getxAxis($scope.histogram.data, 'HH:mm');
+                        // $scope.$watchCollection('histogram', function (nData, oData) {
+                        //     $scope.histogram = nData;
+                        // });
+                        Utill.endLoader();
+                    }, (res) => {
+                        console.log('error', res);
+                        Utill.endLoader();
+                    })
+                });
                 
-                $q.all(coinSymbols.map(function(symbol){
-                    return CorsRequest.get(`data/histohour?fsym=${symbol}&tsym=USD&limit=700`);    
-                })).then(function(res){
-                    
-                    $scope.loadingData = false;
-                    $scope.rawChartData = res.map(function(r){ 
-                        var assetname = r.config.url;
-                        assetname = assetname.slice(assetname.indexOf('fsym'));
-                        assetname = assetname.slice(0, assetname.indexOf('&'));
-                        assetname = assetname.slice(5);
-                        return {...r.data, asset: assetname}; 
-                    });
-
-                    var dataSets = $scope.generateDataSets();
-                    $scope.drawChart(dataSets, 'ss');
-
-                    // $scope.histogram.data = $scope.calcPerformance(res.data.Data);                    
-                    // $scope.histogram.xaxis = $scope.getxAxis($scope.histogram.data, 'HH:mm');
-                    // $scope.$watchCollection('histogram', function (nData, oData) {
-                    //     $scope.histogram = nData;
-                    // });
-                    Utill.endLoader();
-                }, (res) => {
-                    console.log('error', res);
-                    Utill.endLoader();
-                })
             };
 
 
@@ -390,7 +391,7 @@ app.controller('DashCtrl',
             };
 
             $scope.getHistoryDay = () => {
-                $scope.getGrowsGraph();
+                // $scope.getGrowsGraph();
                 // Utill.startLoader();
                 $scope.loadingData = true;
                 var coinSymbols = $scope.getUniqueAssets();
@@ -482,7 +483,7 @@ app.controller('DashCtrl',
                             value: dayTotal
                         });
                     }
-                    $scope.drawGrowthChart(growthData, 'dd');
+                    // $scope.drawGrowthChart(growthData, 'dd');
                 });
             }
             
@@ -572,10 +573,18 @@ app.controller('DashCtrl',
             };
 
             $scope.getUniqueAssets = () => {
-                function onlyUnique(value, index, self) { 
-                    return self.indexOf(value) === index;
-                }
-                return $scope.assets.map(a=>a.symbol).filter( onlyUnique ); // returns ['a', 1, 2, '1']
+                // function onlyUnique(value, index, self) { 
+                //     return self.indexOf(value) === index;
+                // }
+                // return $scope.assets.map(a=>a.symbol).filter( onlyUnique ); // returns ['a', 1, 2, '1']
+                // return ['BTC', 'ETH', 'LTC', 'DASH', 'XMR'];
+                return CorsRequest.get(`data/all/coinlist`).then(function (res) {
+                    var coinlist = [];
+                    for (var coin in res.data.Data) {
+                        coinlist.push(res.data.Data[coin].Symbol);
+                    }
+                    return coinlist;
+                });
             };
 
             $scope.getAssets = () => {
@@ -626,22 +635,22 @@ app.controller('DashCtrl',
             $scope.getCurrencyUSDPrices = () => {
                 // Utill.startLoader();                
                 CorsRequest.get('data/pricemulti?fsyms=BTC,LTC,ETH,USD,EUR&tsyms=BTC,LTC,ETH,USD,EUR').then(function (res) {
-                    $scope.currencyUSDPrices = res.data;
-                    console.log()
-                    $scope.totalAmtInBTC = 0;
-                    $scope.assets.forEach(function (asset, idx) {
-                         $scope.totalAmtInBTC += $scope.holding;
-                        // $scope.totalAmtInBTC +=  $scope.currencyUSDPrices['BTC']['USD'] * asset.buy_p;
-                        if (idx === $scope.assets.length - 1) {
-                            $scope.getHistoryDay();
-                            $scope.period = 'Day';
-                        }
-                    });
-                    Utill.endLoader();
-                }, function (res) {
-                    console.log(res)
-                    Utill.endLoader();
-                })
+                        $scope.currencyUSDPrices = res.data;
+                        console.log()
+                        $scope.totalAmtInBTC = 0;
+                        $scope.assets.forEach(function (asset, idx) {
+                             $scope.totalAmtInBTC += $scope.holding;
+                            // $scope.totalAmtInBTC +=  $scope.currencyUSDPrices['BTC']['USD'] * asset.buy_p;
+                            if (idx === $scope.assets.length - 1) {
+                                $scope.getHistoryDay();
+                                $scope.period = 'Day';
+                            }
+                        });
+                        Utill.endLoader();
+                    }, function (res) {
+                        console.log(res)
+                        Utill.endLoader();
+                    })
             };
 
             $scope.getPieData = () => {
