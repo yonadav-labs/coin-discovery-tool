@@ -144,15 +144,25 @@ function WithPromiseCtrl(DTOptionsBuilder, DTColumnBuilder, $http, $q) {
     var vm = this;
     vm.dtOptions = DTOptionsBuilder.fromFnPromise(function() {
         var defer = $q.defer();
-        $http.get('/src/api/data.json').then(function(result) {
+        $http.get('/src/api/datatable.json').then(function(result) {
             defer.resolve(result.data);
         });
         return defer.promise;
     }).withPaginationType('full_numbers');
 
     vm.dtColumns = [
-        DTColumnBuilder.newColumn('id').withTitle('ID'),
-        DTColumnBuilder.newColumn('firstName').withTitle('First name'),
-        DTColumnBuilder.newColumn('lastName').withTitle('Last name')
+        DTColumnBuilder.newColumn('engine', 'Rank').renderWith(function(data, type, full) {
+            return '<a href="/aaa" style="color: blue;">'+full.engine + ' ' + full.browser+'</a>';
+        }),
+        DTColumnBuilder.newColumn('browser').withTitle('Name (symbol)'),
+        DTColumnBuilder.newColumn('platform').withTitle('Coin Name'),
+        DTColumnBuilder.newColumn('version').withTitle('Current Price'),
+        DTColumnBuilder.newColumn('engine').withTitle('Market Cap'),
+        DTColumnBuilder.newColumn('grade').withTitle('Volume'),
+        DTColumnBuilder.newColumn('grade').withTitle('Price Change vs. Prior Period'),
+        DTColumnBuilder.newColumn('grade').withTitle('Start Date'),
+        DTColumnBuilder.newColumn('grade').withTitle('Discussion Links'),
+        DTColumnBuilder.newColumn('grade').withTitle('Affiliate Links'),
+        DTColumnBuilder.newColumn('grade').withTitle('Google Search Volume')
     ];
 }

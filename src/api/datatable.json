@@ -1,4 +1,4 @@
-{ "aaData": [
+[
 	{
 		"engine": "Trident",
 		"browser": "Internet Explorer 4.0",
@@ -398,4 +398,4 @@
 		"version": "-",
 		"grade": "U"
 	}
-] }
+] 
