@@ -8,6 +8,17 @@ app.controller('DashCtrl',
                 period: 24      // day
             };
 
+            $scope.coins = ['BTC'];
+
+            CorsRequest.get(`data/all/coinlist`).then(function (res) {
+                var coinlist = [];
+                for (var coin in res.data.Data) {
+                    coinlist.push(res.data.Data[coin].Symbol);
+                }
+            
+                $scope.coins = coinlist;
+            });
+
             $scope.drawChart = function(dataSets, minPeriod) {
                 var chart = AmCharts.makeChart( "chart-user", {
                     "type": "stock",
