@@ -140,40 +140,45 @@ app.controller('DashCtrl',
 
 app.controller('WithPromiseCtrl', WithPromiseCtrl);
 
-function WithPromiseCtrl(DTOptionsBuilder, DTColumnBuilder, $http, $q) {
+function WithPromiseCtrl(DTOptionsBuilder, DTColumnBuilder, CorsRequest, $q) {
     var vm = this;
     vm.dtOptions = DTOptionsBuilder.fromFnPromise(function() {
         var defer = $q.defer();
-        $http.get('/src/api/datatable.json').then(function(result) {
-            defer.resolve(result.data);
+        CorsRequest.get('data/all/coinlist').then(function(result) {
+            var coinlist = [];
+            for (var coin in result.data.Data) {
+                coinlist.push(result.data.Data[coin]);
+            }
+            defer.resolve(coinlist);
         });
         return defer.promise;
     }).withPaginationType('full_numbers');
 
     vm.dtColumns = [
-        DTColumnBuilder.newColumn('engine', 'Rank').renderWith(function(data, type, full) {
-            return '<a href="/aaa" style="color: blue;">'+full.engine + ' ' + full.browser+'</a>';
+        DTColumnBuilder.newColumn('Id', 'ID'),
+        DTColumnBuilder.newColumn('SortOrder', 'Rank'),
+        DTColumnBuilder.newColumn('Name').withTitle('Name (symbol)').renderWith(function(data, type, full) {
+            return '<img width=24 style="margin-right:5px;" src="https://www.cryptocompare.com'+full.ImageUrl+'">'+full.Name;
         }),
-        DTColumnBuilder.newColumn('browser').withTitle('Name (symbol)'),
-        DTColumnBuilder.newColumn('platform').withTitle('Coin Name'),
-        DTColumnBuilder.newColumn('version', 'Current Price').renderWith(function(data, type, full) {
-            if (full.version == '-') {
-                return '-'
-            } else {
-                var version = parseFloat(full.version);
-                if (version > 50) {
-                    return '<span style="color: green;">' + full.version + '</span>';
-                } else {
-                    return '<span style="color: red;">' + full.version + '</span>';
-                }
-            }
-        }),
-        DTColumnBuilder.newColumn('engine').withTitle('Market Cap'),
-        DTColumnBuilder.newColumn('grade').withTitle('Volume'),
-        DTColumnBuilder.newColumn('grade').withTitle('Price Change vs. Prior Period'),
-        DTColumnBuilder.newColumn('grade').withTitle('Start Date'),
-        DTColumnBuilder.newColumn('grade').withTitle('Discussion Links'),
-        DTColumnBuilder.newColumn('grade').withTitle('Affiliate Links'),
-        DTColumnBuilder.newColumn('grade').withTitle('Google Search Volume')
+        DTColumnBuilder.newColumn('CoinName').withTitle('Coin Name'),
+        // DTColumnBuilder.newColumn('version', 'Current Price').renderWith(function(data, type, full) {
+        //     if (full.version == '-') {
+        //         return '-'
+        //     } else {
+        //         var version = parseFloat(full.version);
+        //         if (version > 50) {
+        //             return '<span style="color: green;">' + full.version + '</span>';
+        //         } else {
+        //             return '<span style="color: red;">' + full.version + '</span>';
+        //         }
+        //     }
+        // }),
+        // DTColumnBuilder.newColumn('engine').withTitle('Market Cap'),
+        // DTColumnBuilder.newColumn('grade').withTitle('Volume'),
+        // DTColumnBuilder.newColumn('grade').withTitle('Price Change vs. Prior Period'),
+        // DTColumnBuilder.newColumn('grade').withTitle('Start Date'),
+        // DTColumnBuilder.newColumn('grade').withTitle('Discussion Links'),
+        // DTColumnBuilder.newColumn('grade').withTitle('Affiliate Links'),
+        // DTColumnBuilder.newColumn('grade').withTitle('Google Search Volume')
     ];
 }
