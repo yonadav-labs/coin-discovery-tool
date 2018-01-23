@@ -1,7 +1,3 @@
-<!-- <div class="hbox hbox-auto-xs hbox-auto-sm" ng-init="
-    app.settings.asideFolded = false; 
-    app.settings.asideDock = false;
-  "> -->
   <!-- main -->
   <div class="col">
     <!-- main header -->
@@ -16,58 +12,7 @@
     <!-- / main header -->
     <div class="wrapper-md" ng-controller="FlotChartDemoCtrl">
       <!-- stats -->
-      <div class="row">
-        <div class="col-md-6">
-          <div class="row row-sm text-center">
-            <div class="col-sm-6">
-              <div class="panel padder-v item bg-primary">
-                <div class="h3 text-white font-bold">${{depositsTotal || 0 | number:'2'}}</div>
-                <span class="text-muted text-xs">Acquisition Costs</span>
-                <div class="top text-right w-full">
-                  <i class="fa fa-caret-down text-warning m-r-sm"></i>
-                </div>   
-              </div>      
-            </div>
-            <div class="col-sm-6">
-              <div class="panel padder-v item bg-info">
-                <div class="h3 text-white font-bold">${{holdings || 0 | number:'2'}}</div>
-                <span class="text-muted text-xs">Holdings</span>
-                <div class="top text-right w-full">
-                  <i class="fa fa-caret-up text-success m-r-sm"></i>
-                </div>
-              </div>
-            </div>
-            <div class="col-sm-6">
-              <a href class="block panel padder-v  item">
-                <span class="font-bold h3 block" ng-class="(profitLossPct >= 0) ?'text-success':'text-danger'">{{profitLossPct || 0 | number:2}} %</span>
-                <span class="text-muted text-xs">Profit/Loss %</span>
-                <span class="bottom text-center w-full">
-                  <!-- <span class="text-muted">{{period}}</span> -->
-                </span>
-              </a>
-            </div>
-
-            <div class="col-sm-6">
-              <a href class="block panel padder-v  item">
-                <span class="font-bold h3 block" ng-class="(profitLossAmt >= 0) ?'text-success':'text-danger'">${{profitLossAmt || 0 | number:'2'}}</span>
-                <span class="text-muted text-xs">Profit/Loss $</span>
-                <span class="bottom text-center w-full">
-                  <!-- <span class="text-muted">{{period}}</span> -->
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="panel panel-default">
-            <!-- <div class="panel-heading font-bold">Assets</div> -->
-            <div class="panel-body">
-              <canvas id="pie" class="chart chart-pie" chart-data="pie.data" chart-labels="pie.labels" chart-options="pie.options" height="90">
-              </canvas>
-            </div>
-          </div>
-        </div>
-
+      <div class="row">       
 
     <div class="col-md-12 col-sm-12">       
       <div class="wrapper">
@@ -120,5 +65,3 @@
       </div>
 
   </div>
-    <!-- </div> -->
-    <!-- / stats -->
