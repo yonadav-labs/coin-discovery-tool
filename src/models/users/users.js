@@ -8,9 +8,6 @@ app.controller('UsersCtrl',
 
             $scope.datatableOptions = DTOptionsBuilder.newOptions().withBootstrap();
 
-            
-
-
             $scope.getUsers = () => {
                 Utill.startLoader();   
                 Request.get('admin-users/').then((res) => {
