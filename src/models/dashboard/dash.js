@@ -156,7 +156,18 @@ function WithPromiseCtrl(DTOptionsBuilder, DTColumnBuilder, $http, $q) {
         }),
         DTColumnBuilder.newColumn('browser').withTitle('Name (symbol)'),
         DTColumnBuilder.newColumn('platform').withTitle('Coin Name'),
-        DTColumnBuilder.newColumn('version').withTitle('Current Price'),
+        DTColumnBuilder.newColumn('version', 'Current Price').renderWith(function(data, type, full) {
+            if (full.version == '-') {
+                return '-'
+            } else {
+                var version = parseFloat(full.version);
+                if (version > 50) {
+                    return '<span style="color: green;">' + full.version + '</span>';
+                } else {
+                    return '<span style="color: red;">' + full.version + '</span>';
+                }
+            }
+        }),
         DTColumnBuilder.newColumn('engine').withTitle('Market Cap'),
         DTColumnBuilder.newColumn('grade').withTitle('Volume'),
         DTColumnBuilder.newColumn('grade').withTitle('Price Change vs. Prior Period'),

@@ -44,13 +44,13 @@
                 <div class="btn-group" ng-init="radioModel = 'Day'">
                   <label ng-click="price_param.period=24;drawPriceHistory();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel"
                     btn-radio="'Day'" aria-invalid="false">
-                    <i class="fa fa-check text-active"></i> Day</label>
+                    <i class="fa fa-check text-active"></i> Last 24 Hours</label>
                   <label ng-click="price_param.period=150;drawPriceHistory();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty active ng-valid-parse"
                     ng-model="radioModel" btn-radio="'Week'" aria-invalid="false">
-                    <i class="fa fa-check text-active"></i> Week</label>
-                  <label ng-click="price_param.period=700;drawPriceHistory();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel"
+                    <i class="fa fa-check text-active"></i> Last Week</label>
+                  <label ng-click="price_param.period=720;drawPriceHistory();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel"
                     btn-radio="'Month'" aria-invalid="false">
-                    <i class="fa fa-check text-active"></i> Month</label>
+                    <i class="fa fa-check text-active"></i> Last Month</label>
                 </div>
               </center>
             </div>
