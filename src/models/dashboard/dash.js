@@ -3,8 +3,10 @@ app.controller('DashCtrl',
         function ($scope, $stateParams, $state, $interval, $rootScope, UserService, Request, CorsRequest, $localStorage, Utill, $q) {
 
             $scope.loadingData = false;
-            $scope.coin = 'BTC';
-            $scope.h_period = 24;     // day
+            $scope.price_param = {
+                coin: 'BTC',
+                period: 24      // day
+            };
 
             $scope.drawChart = function(dataSets, minPeriod) {
                 var chart = AmCharts.makeChart( "chart-user", {
@@ -100,7 +102,7 @@ app.controller('DashCtrl',
 
             $scope.drawPriceHistory = () => {
                 $scope.loadingData = true;
-                CorsRequest.get(`data/histohour?fsym=${$scope.coin}&tsym=USD&limit=${$scope.h_period}`).then(function (r) {
+                CorsRequest.get(`data/histohour?fsym=${$scope.price_param.coin}&tsym=USD&limit=${$scope.price_param.period}`).then(function (r) {
                         $scope.loadingData = false;
                         var assetname = r.config.url;
                         assetname = assetname.slice(assetname.indexOf('fsym'));

@@ -47,13 +47,13 @@
             <div class="m-b-sm">
               <center  style="margin-top: 15px">
                 <div class="btn-group" ng-init="radioModel = 'Day'">
-                  <label ng-click="periodFilter('Day')" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel"
+                  <label ng-click="price_param.period=24;drawPriceHistory();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel"
                     btn-radio="'Day'" aria-invalid="false">
                     <i class="fa fa-check text-active"></i> Day</label>
-                  <label ng-click="periodFilter('Week')" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty active ng-valid-parse"
+                  <label ng-click="price_param.period=150;drawPriceHistory();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty active ng-valid-parse"
                     ng-model="radioModel" btn-radio="'Week'" aria-invalid="false">
                     <i class="fa fa-check text-active"></i> Week</label>
-                  <label ng-click="periodFilter('Month')" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel"
+                  <label ng-click="price_param.period=700;drawPriceHistory();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel"
                     btn-radio="'Month'" aria-invalid="false">
                     <i class="fa fa-check text-active"></i> Month</label>
                 </div>
