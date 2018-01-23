@@ -109,8 +109,7 @@ angular.module('app')
                   url: '/dashboard',
                   templateUrl: 'models/dashboard/dash.html',
                   data : {requiredLogin: true },
-                  resolve: load(['js/controllers/chart.js']),
-                  controller: 'DashCtrl'
+                  controller: 'DashCtrl as vm'
               })
 
              .state('access', {

@@ -10,7 +10,7 @@
       </div>
     </div>
     <!-- / main header -->
-    <div class="wrapper-md" ng-controller="FlotChartDemoCtrl">
+    <div class="wrapper-md" >
       <!-- stats -->
       <div class="row">       
 
@@ -27,7 +27,7 @@
           <div class="panel-body">
             <div class="coin-list">
               <label>Cryptocurrency: </label>
-              <select ng-model="price_param.coin" ng-options="coin for coin in coins" ng-change="drawPriceHistory();">
+              <select ng-model="price_param.coin" ng-options="coin for coin in symbol_list" ng-change="drawPriceHistory();">
               </select>              
             </div>
 
@@ -71,8 +71,8 @@
           Coin List
         </div>
         <div class="panel-body">
-          <div ng-controller="WithPromiseCtrl as showCase">
-              <table datatable="" dt-options="showCase.dtOptions" dt-columns="showCase.dtColumns" class="table table-striped table-responsive"></table>
+          <div>
+              <table datatable="" dt-options="vm.dtOptions" dt-columns="vm.dtColumns" class="table table-striped table-responsive"></table>
           </div>        
         </div>
       </div>

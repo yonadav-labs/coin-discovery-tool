@@ -1,164 +1,156 @@
-app.controller('DashCtrl',
-    ['$scope', '$stateParams', '$state', '$interval', '$rootScope', 'UserService', 'Request', 'CorsRequest', '$localStorage', 'Utill', '$q',
-        function ($scope, $stateParams, $state, $interval, $rootScope, UserService, Request, CorsRequest, $localStorage, Utill, $q) {
+app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $rootScope, UserService, Request, CorsRequest, $localStorage, Utill, $q, DTOptionsBuilder, DTColumnBuilder) {
+    $scope.loadingData = false;
+    $scope.price_param = {
+        coin: 'BTC',
+        period: 24      // day
+    };
 
-            $scope.loadingData = false;
-            $scope.price_param = {
-                coin: 'BTC',
-                period: 24      // day
-            };
+    $scope.symbol_list = ['BTC'];
 
-            $scope.coins = ['BTC'];
+    $scope.drawChart = function(dataSets, minPeriod) {
+        var chart = AmCharts.makeChart( "chart-user", {
+            "type": "stock",
+            "hideCredits": true,
 
-            CorsRequest.get(`data/all/coinlist`).then(function (res) {
-                var coinlist = [];
-                for (var coin in res.data.Data) {
-                    coinlist.push(res.data.Data[coin].Symbol);
-                }
-            
-                $scope.coins = coinlist;
+            "theme": "light",  
+            "dataSets": dataSets,
+
+            "panels": [ {
+                "title": "Value",
+                "stockGraphs": [ {
+                    "id": "g1",
+                    "valueField": "value",
+                    "comparable": true,
+                    "compareField": "value",
+                    "balloonText": "[[title]]:<b>[[value]]</b>",
+                    "compareGraphBalloonText": "[[title]]:<b>[[value]]</b>"
+                } ],
+                "stockLegend": {
+                    "valueTextRegular": " ",
+                    "markerType": "none",
+                    "periodValueTextComparing": "[[percents.value.close]]%",
+                    "periodValueTextRegular": "[[value.close]]"
+                },
+
+                "valueAxes": [ {
+                    "id": "v1",
+                    "dashLength": 5
+                } ],
+
+                "categoryAxis": {
+                    "dashLength": 5
+                },
+            },],
+
+            "chartScrollbarSettings": {
+                "graph": "g1",
+                "graphType": "line",
+                "usePeriod": "WW"
+            },
+
+            "chartCursorSettings": {
+                "valueBalloonsEnabled": true,
+                "graphBulletSize": 1,
+                "valueLineBalloonEnabled": true,
+                "valueLineEnabled": true,
+                "valueLineAlpha": 0.5
+            },
+
+            "categoryAxesSettings": {
+                "minPeriod": minPeriod,
+                "equalSpacing": true,
+                "startOnAxis": true
+            },
+
+            "export": {
+                "enabled": true
+            },
+        } );
+        chart.validateData();
+    }
+
+    $scope.generateDataSets = function() {
+        var dataSets = [];
+        chartData = $scope.rawChartData.map(function(item) {
+            var chartData = [];
+            chartData = item.Data.map(function(item){
+                return {
+                    // "date": moment(item.time).format('YY-MM-DD HH-MM-SS'),
+                    "date": new Date(+item.time *1000),
+                    "value": item.close,
+                    "volume": Math.round( Math.random() * 22 )
+                };
             });
 
-            $scope.drawChart = function(dataSets, minPeriod) {
-                var chart = AmCharts.makeChart( "chart-user", {
-                    "type": "stock",
-                    "hideCredits": true,
+            return {
+                "fieldMappings": [ {
+                  "fromField": "value",
+                  "toField": "value"
+                }, {
+                  "fromField": "volume",
+                  "toField": "volume"
+                } ],
 
-                    "theme": "light",  
-                    "dataSets": dataSets,
-
-                    "panels": [ {
-                        "title": "Value",
-                        "stockGraphs": [ {
-                            "id": "g1",
-                            "valueField": "value",
-                            "comparable": true,
-                            "compareField": "value",
-                            "balloonText": "[[title]]:<b>[[value]]</b>",
-                            "compareGraphBalloonText": "[[title]]:<b>[[value]]</b>"
-                        } ],
-                        "stockLegend": {
-                            "valueTextRegular": " ",
-                            "markerType": "none",
-                            "periodValueTextComparing": "[[percents.value.close]]%",
-                            "periodValueTextRegular": "[[value.close]]"
-                        },
-
-                        "valueAxes": [ {
-                            "id": "v1",
-                            "dashLength": 5
-                        } ],
-
-                        "categoryAxis": {
-                            "dashLength": 5
-                        },
-                    },],
-
-                    "chartScrollbarSettings": {
-                        "graph": "g1",
-                        "graphType": "line",
-                        "usePeriod": "WW"
-                    },
-
-                    "chartCursorSettings": {
-                        "valueBalloonsEnabled": true,
-                        "graphBulletSize": 1,
-                        "valueLineBalloonEnabled": true,
-                        "valueLineEnabled": true,
-                        "valueLineAlpha": 0.5
-                    },
-
-                    "categoryAxesSettings": {
-                        "minPeriod": minPeriod,
-                        "equalSpacing": true,
-                        "startOnAxis": true
-                    },
-
-                    "export": {
-                        "enabled": true
-                    },
-                } );
-                chart.validateData();
+                "dataProvider": chartData,
+                "categoryField": "date",
+                "title": item.asset
             }
+        })
+        return chartData;
+    }
 
-            $scope.generateDataSets = function() {
-                var dataSets = [];
-                chartData = $scope.rawChartData.map(function(item) {
-                    var chartData = [];
-                    chartData = item.Data.map(function(item){
-                        return {
-                            // "date": moment(item.time).format('YY-MM-DD HH-MM-SS'),
-                            "date": new Date(+item.time *1000),
-                            "value": item.close,
-                            "volume": Math.round( Math.random() * 22 )
-                        };
-                    });
+    $scope.drawPriceHistory = () => {
+        $scope.loadingData = true;
+        CorsRequest.get(`data/histohour?fsym=${$scope.price_param.coin}&tsym=USD&limit=${$scope.price_param.period}`).then(function (r) {
+                $scope.loadingData = false;
+                var assetname = r.config.url;
+                assetname = assetname.slice(assetname.indexOf('fsym'));
+                assetname = assetname.slice(0, assetname.indexOf('&'));
+                assetname = assetname.slice(5);
 
-                    return {
-                        "fieldMappings": [ {
-                          "fromField": "value",
-                          "toField": "value"
-                        }, {
-                          "fromField": "volume",
-                          "toField": "volume"
-                        } ],
+                $scope.rawChartData = [{...r.data, asset: assetname}]; 
+                var dataSets = $scope.generateDataSets();
+                $scope.drawChart(dataSets, 'ss');
 
-                        "dataProvider": chartData,
-                        "categoryField": "date",
-                        "title": item.asset
-                    }
-                })
-                return chartData;
+                Utill.endLoader();
             }
+        );
+    };
 
-            $scope.drawPriceHistory = () => {
-                $scope.loadingData = true;
-                CorsRequest.get(`data/histohour?fsym=${$scope.price_param.coin}&tsym=USD&limit=${$scope.price_param.period}`).then(function (r) {
-                        $scope.loadingData = false;
-                        var assetname = r.config.url;
-                        assetname = assetname.slice(assetname.indexOf('fsym'));
-                        assetname = assetname.slice(0, assetname.indexOf('&'));
-                        assetname = assetname.slice(5);
+    $scope.drawPriceHistory();
 
-                        $scope.rawChartData = [{...r.data, asset: assetname}]; 
-                        var dataSets = $scope.generateDataSets();
-                        $scope.drawChart(dataSets, 'ss');
+    $scope.$on("$destroy", function () {
+        if (angular.isDefined($scope.interval)) {
+            $interval.cancel($scope.interval);
+        }
+    });
 
-                        Utill.endLoader();
-                    }
-                );
-            };
-
-            $scope.drawPriceHistory();
-
-            $scope.$on("$destroy", function () {
-                if (angular.isDefined($scope.interval)) {
-                    $interval.cancel($scope.interval);
-                }
-            });
-        }]);
-
-app.controller('WithPromiseCtrl', WithPromiseCtrl);
-
-function WithPromiseCtrl(DTOptionsBuilder, DTColumnBuilder, CorsRequest, $q) {
     var vm = this;
     vm.dtOptions = DTOptionsBuilder.fromFnPromise(function() {
         var defer = $q.defer();
         CorsRequest.get('data/all/coinlist').then(function(result) {
+            $scope.coins = result.data.Data;
+            $scope.symbol_list = [];
             var coinlist = [];
-            for (var coin in result.data.Data) {
-                coinlist.push(result.data.Data[coin]);
+            for (var coin in $scope.coins) {
+                coinlist.push($scope.coins[coin]);
+                $scope.symbol_list.push($scope.coins[coin].Symbol);
             }
             defer.resolve(coinlist);
         });
         return defer.promise;
-    }).withPaginationType('full_numbers');
+    }).withLanguage({
+        "oPaginate": {
+            "sNext":     ">",
+            "sPrevious": "<"
+        }
+    });
 
     vm.dtColumns = [
         DTColumnBuilder.newColumn('Id', 'ID'),
         DTColumnBuilder.newColumn('SortOrder', 'Rank'),
         DTColumnBuilder.newColumn('Name').withTitle('Name (symbol)').renderWith(function(data, type, full) {
-            return '<img width=24 style="margin-right:5px;" src="https://www.cryptocompare.com'+full.ImageUrl+'">'+full.Name;
+            return '<img width=24 style="margin-right:5px;" lazyload src="https://www.cryptocompare.com'+full.ImageUrl+'">'+full.Name;
         }),
         DTColumnBuilder.newColumn('CoinName').withTitle('Coin Name'),
         // DTColumnBuilder.newColumn('version', 'Current Price').renderWith(function(data, type, full) {
@@ -181,4 +173,4 @@ function WithPromiseCtrl(DTOptionsBuilder, DTColumnBuilder, CorsRequest, $q) {
         // DTColumnBuilder.newColumn('grade').withTitle('Affiliate Links'),
         // DTColumnBuilder.newColumn('grade').withTitle('Google Search Volume')
     ];
-}
+});
