@@ -297,39 +297,7 @@ app.controller('DashCtrl',
                 $scope.period = period;
             };
 
-            $scope.getHistoryMonth = () => {
-                // Utill.startLoader();
-                // $scope.loadingData = true;
-                // var coinSymbols = $scope.assets.map((data) => data.symbol);
-                
-                // var promises = [];
-                // coinSymbols.map(function(symbol){
-                //     for (var d = 1; d <= 30; d ++ ){
-                //         var date = moment().subtract('day', d).unix();
-                //         promises.push(CorsRequest.get(`data/pricehistorical?fsym=${symbol}&tsyms=USD&ts=${Math.round(date)}`));    
-                //     }
-                    
-                // });
-                // $q.all(promises).then(function(res){
-                    
-                //     $scope.loadingData = false;
-                //     $scope.rawChartData = res.map(function(r){ 
-                //         var assetname = r.config.url;
-                //         assetname = assetname.slice(assetname.indexOf('fsym'));
-                //         assetname = assetname.slice(0, assetname.indexOf('&'));
-                //         assetname = assetname.slice(5);
-                //         var ts = r.config.url;
-                //         ts = ts.slice(ts.indexOf('&ts='));
-                //         ts = ts.slice(4);
-                //         return {...r.data, asset: assetname, ts: ts}; 
-                //     });
-                //     var dataSets = $scope.generateDataSetsForHistory();
-                //     $scope.drawChart(dataSets, 'DD');
-                //     Utill.endLoader()
-                // }, (res) => {
-                //     console.log('error', res);
-                // })
-
+            $scope.getHistoryMonth = () => {                
                 $scope.loadingData = true;
                 $scope.getUniqueAssets().then(function(coinSymbols) {
                     $q.all(coinSymbols.map(function(symbol){
@@ -348,11 +316,6 @@ app.controller('DashCtrl',
                         var dataSets = $scope.generateDataSets();
                         $scope.drawChart(dataSets, 'ss');
 
-                        // $scope.histogram.data = $scope.calcPerformance(res.data.Data);                    
-                        // $scope.histogram.xaxis = $scope.getxAxis($scope.histogram.data, 'HH:mm');
-                        // $scope.$watchCollection('histogram', function (nData, oData) {
-                        //     $scope.histogram = nData;
-                        // });
                         Utill.endLoader();
                     }, (res) => {
                         console.log('error', res);
@@ -412,13 +375,7 @@ app.controller('DashCtrl',
 
                     var dataSets = $scope.generateDataSets();
                     $scope.drawChart(dataSets, 'ss');
-                    
-                    
-                    // $scope.histogram.data = $scope.calcPerformance(res.data.Data);                    
-                    // $scope.histogram.xaxis = $scope.getxAxis($scope.histogram.data, 'HH:mm');
-                    // $scope.$watchCollection('histogram', function (nData, oData) {
-                    //     $scope.histogram = nData;
-                    // });
+                                    
                     Utill.endLoader();
                 }, (res) => {
                     console.log('error', res);
@@ -508,41 +465,6 @@ app.controller('DashCtrl',
                     }
                 });
             };
-
-            // $scope.calcPerformance = (data) => {
-            //     $scope.percentageDifference = 0;
-            //     $scope.amountDifference = 0;
-            //     return data.map(function (data, idx) {
-            //         var holding = 0;
-            //         $scope.assets.forEach(function (asset, idx) {
-            //             var date = moment.unix(data.time).format('YYYY-MM-DD HH:mm:ss');
-            //             var isBetween = moment(asset.transaction_date).isBetween($scope.initTransactionDate, date, null, '[]');
-
-            //             if (!isBetween) {
-            //                 return holding += 0;
-            //             } else {
-            //                 var a = $scope.currencyUSDPrices[asset.symbol].BTC;
-            //                 var b = $scope.currencyUSDPrices['BTC']['USD'];
-            //                 return holding += a * b * asset.amount;
-            //             }
-            //         });
-
-            //         let d = data.close - data.open;
-
-            //         let pctDiff = (+d.toFixed(2) / data.open) * 100;
-
-            //         $scope.percentageDifference += +pctDiff.toFixed(2);
-
-            //         let amt = (+pctDiff.toFixed(2) / 100) * holding;
-
-            //         $scope.amountDifference += +amt.toFixed(2);
-
-            //         holding = +(holding + amt).toFixed(2);
-
-            //         return [data.time, holding];
-                    
-            //     });
-            // }
 
             $scope.getSummary = () => {
                 $scope.holdings = 0;
