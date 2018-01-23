@@ -197,15 +197,27 @@ app.controller('DashCtrl',
                         "position": "top"
                     },
 
-
+                    "listeners": [{
+                            "event": "drawn",
+                            "method": handleZoom
+                        }, 
+                        // {
+                        //     "event": "dataUpdated",
+                        //     "method": handleZoom
+                        // }
+                    ],
                     "export": {
                         "enabled": true
                     },
                 } );
                 chart.validateData();
+
+                // chart.addListener("rendered", handleZoom);
+
+                function handleZoom(event) {
+                   console.log(event);
+                }
             }
-
-
 
             $scope.generateDataSetsForHistory = function () {
                 var dataSets = [];
@@ -357,30 +369,31 @@ app.controller('DashCtrl',
                 // $scope.getGrowsGraph();
                 // Utill.startLoader();
                 $scope.loadingData = true;
-                var coinSymbols = $scope.getUniqueAssets();
+                $scope.getUniqueAssets().then(function(coinSymbols) {
+                    $q.all(coinSymbols.map(function(symbol){
+                        return CorsRequest.get(`data/histohour?fsym=${symbol}&tsym=USD&limit=24`);    
+                    })).then(function(res){
+                        
+                        $scope.loadingData = false;
+                        $scope.rawChartData = res.map(function(r){ 
+                            var assetname = r.config.url;
+                            assetname = assetname.slice(assetname.indexOf('fsym'));
+                            assetname = assetname.slice(0, assetname.indexOf('&'));
+                            assetname = assetname.slice(5);
+                            return {...r.data, asset: assetname}; 
+                        });
+
+
+                        var dataSets = $scope.generateDataSets();
+                        $scope.drawChart(dataSets, 'ss');
+                                        
+                        Utill.endLoader();
+                    }, (res) => {
+                        console.log('error', res);
+                        Utill.endLoader();
+                    })
+                });
                 
-                $q.all(coinSymbols.map(function(symbol){
-                    return CorsRequest.get(`data/histohour?fsym=${symbol}&tsym=USD&limit=24`);    
-                })).then(function(res){
-                    
-                    $scope.loadingData = false;
-                    $scope.rawChartData = res.map(function(r){ 
-                        var assetname = r.config.url;
-                        assetname = assetname.slice(assetname.indexOf('fsym'));
-                        assetname = assetname.slice(0, assetname.indexOf('&'));
-                        assetname = assetname.slice(5);
-                        return {...r.data, asset: assetname}; 
-                    });
-
-
-                    var dataSets = $scope.generateDataSets();
-                    $scope.drawChart(dataSets, 'ss');
-                                    
-                    Utill.endLoader();
-                }, (res) => {
-                    console.log('error', res);
-                    Utill.endLoader();
-                })
             };
 
             $scope.getGrowsGraph = function() {
@@ -495,17 +508,12 @@ app.controller('DashCtrl',
             };
 
             $scope.getUniqueAssets = () => {
-                // function onlyUnique(value, index, self) { 
-                //     return self.indexOf(value) === index;
-                // }
-                // return $scope.assets.map(a=>a.symbol).filter( onlyUnique ); // returns ['a', 1, 2, '1']
-                // return ['BTC', 'ETH', 'LTC', 'DASH', 'XMR'];
                 return CorsRequest.get(`data/all/coinlist`).then(function (res) {
                     var coinlist = [];
                     for (var coin in res.data.Data) {
-                        coinlist.push(res.data.Data[coin].Symbol);
+                        coinlist.push(res.data.Data[coin]);
                     }
-                    return coinlist;
+                    return coinlist.sort(function(a, b) { return parseInt(a.SortOrder) - parseInt(b.SortOrder); }).map(a=>a.Symbol).slice(0, 10);
                 });
             };
 
@@ -517,9 +525,6 @@ app.controller('DashCtrl',
                         return 0;
                     };
                     $scope.initDepositDate = moment(res.data[res.data.length - 1].transaction_date);
-                    // $scope.depositsTotal = res.data.reduce((total, asset) => {
-                    //     return +total + (+asset.amount * +asset.buy_price);
-                    // }, 0);
 
                     var sortedData = res.data.sort(function (a, b) {
                         return a.transaction_date - b.transaction_date;
