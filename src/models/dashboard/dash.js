@@ -162,6 +162,9 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         CorsRequest.get(`data/pricemultifull?fsyms=${sym_arr}&tsyms=USD`).then(function(result) {
             for (var coin in result.data.DISPLAY) {
                 angular.element('.current-price-'+coin).html(result.data.DISPLAY[coin].USD.PRICE);
+                angular.element('.market-cap-'+coin).html(result.data.DISPLAY[coin].USD.MKTCAP);
+                angular.element('.volumedayto-'+coin).html(result.data.DISPLAY[coin].USD.VOLUMEDAYTO);
+                angular.element('.change24hour-'+coin).html(result.data.DISPLAY[coin].USD.CHANGE24HOUR);
             }
         });        
     });
@@ -175,12 +178,18 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         DTColumnBuilder.newColumn('current_price', 'Current Price').renderWith(function(data, type, full) {
             return `<span class="current-price-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
         }),
-        // DTColumnBuilder.newColumn('engine').withTitle('Market Cap'),
-        // DTColumnBuilder.newColumn('grade').withTitle('Volume'),
-        // DTColumnBuilder.newColumn('grade').withTitle('Price Change vs. Prior Period'),
-        // DTColumnBuilder.newColumn('grade').withTitle('Start Date'),
-        // DTColumnBuilder.newColumn('grade').withTitle('Discussion Links'),
-        // DTColumnBuilder.newColumn('grade').withTitle('Affiliate Links'),
-        // DTColumnBuilder.newColumn('grade').withTitle('Google Search Volume')
+        DTColumnBuilder.newColumn('Id').withTitle('Market Cap').renderWith(function(data, type, full) {
+            return `<span class="market-cap-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
+        }),
+        DTColumnBuilder.newColumn('Id').withTitle('VOLUMEDAYTO').renderWith(function(data, type, full) {
+            return `<span class="volumedayto-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
+        }),
+        DTColumnBuilder.newColumn('Id').withTitle('CHANGE24HOUR').renderWith(function(data, type, full) {
+            return `<span class="change24hour-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
+        }),
+        // DTColumnBuilder.newColumn('Id').withTitle('Start Date'),
+        // DTColumnBuilder.newColumn('Id').withTitle('Discussion Links'),
+        // DTColumnBuilder.newColumn('Id').withTitle('Affiliate Links'),
+        // DTColumnBuilder.newColumn('Id').withTitle('Google Search Volume')
     ];
 });
