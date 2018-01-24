@@ -178,7 +178,13 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         for (i=0; i<cid_arr.length; i++) {
             var cid = cid_arr[i];
             CorsRequest.get(`https://www.cryptocompare.com/api/data/coinsnapshotfullbyid/?id=${cid}`, true).then(function(result) {
-                console.log(result);
+                var coin = result.data.Data.General.Symbol;
+                
+                $scope.coins[coin].affiliate = result.data.Data.General.AffiliateUrl;
+                $scope.coins[coin].start_date = result.data.Data.General.StartDate;
+
+                angular.element('.affiliate-'+coin).html('<a target="_blank" style="color: blue;" href="'+$scope.coins[coin].affiliate+'">'+$scope.coins[coin].affiliate+'</a>');
+                angular.element('.start-date-'+coin).html($scope.coins[coin].start_date);
             }, function(err) {
                 console.log('########');
                 console.log(err);
@@ -231,8 +237,12 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
             return `<span class="supply-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
         }),
         DTColumnBuilder.newColumn('TotalCoinSupply', 'TotalCoinSupply').withOption('type', 'num-fmt'),
-        DTColumnBuilder.newColumn('start_date').withTitle('Start Date'),
-        DTColumnBuilder.newColumn('affiliate').withTitle('Affiliate Links'),
+        DTColumnBuilder.newColumn('start_date').withTitle('Start Date').renderWith(function(data, type, full) {
+            return `<span class="start-date-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
+        }),
+        DTColumnBuilder.newColumn('affiliate').withTitle('Affiliate Links').renderWith(function(data, type, full) {
+            return `<span class="affiliate-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
+        }),
         DTColumnBuilder.newColumn('search_vol').withTitle('Google Search Volume')
     ];
 });
