@@ -135,10 +135,16 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
 
             $scope.coinlist = [];
             for (var coin in $scope.coins) {                
-                $scope.coinlist.push({...$scope.coins[coin], 
-                    current_price: '-',
-                    search_vol: '-'
-                });
+                $scope.coins[coin].current_price = '-';
+                $scope.coins[coin].search_vol = '-';
+                $scope.coins[coin].start_date = '-';
+                $scope.coins[coin].affiliate = '-';
+                $scope.coins[coin].market_cap = '-';
+                $scope.coins[coin].volumedayto = '-';
+                $scope.coins[coin].change24hour = '-';
+                $scope.coins[coin].supply = '-';
+
+                $scope.coinlist.push($scope.coins[coin]);
             }
 
             defer.resolve($scope.coinlist);
@@ -151,25 +157,48 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         }
     }).withOption('drawCallback', function(settings) {
         // console.log(settings.nTBody.children);
-        var sym_arr = [];
+        var sym_arr = [],
+            cid_arr = [];
         for (i=0; i < settings.nTBody.children.length; i++) {
             var url = settings.nTBody.children[i].children[1].children[0].attributes[0].value,
-                name = settings.nTBody.children[i].children[1].children[0].attributes[1].value;
+                name = settings.nTBody.children[i].children[1].children[0].attributes[1].value,
+                symbol = settings.nTBody.children[i].children[3].children[0].attributes[1].value,
+                cid = settings.nTBody.children[i].children[4].children[0].attributes[1].value;
 
-            settings.nTBody.children[i].children[1].children[0].innerHTML = '<img width=24 style="margin-right:5px;" src="https://www.cryptocompare.com'+url+'">'+name;                
-            sym_arr.push(settings.nTBody.children[i].children[3].children[0].attributes[1].value);
+            if ($scope.coins[symbol].current_price == '-') {
+                settings.nTBody.children[i].children[1].children[0].innerHTML = '<img width=24 style="margin-right:5px;" src="https://www.cryptocompare.com'+url+'">'+name;                
+                sym_arr.push(symbol);                
+                cid_arr.push(cid);
+            }
         }
 
         sym_arr = sym_arr.join(',');
-        
+        if (!sym_arr) return;
+
+        for (i=0; i<cid_arr.length; i++) {
+            var cid = cid_arr[i];
+            CorsRequest.get(`https://www.cryptocompare.com/api/data/coinsnapshotfullbyid/?id=${cid}`, true).then(function(result) {
+                console.log(result);
+            }, function(err) {
+                console.log('########');
+                console.log(err);
+            });
+        }
+
         CorsRequest.get(`data/pricemultifull?fsyms=${sym_arr}&tsyms=USD`).then(function(result) {
             for (var coin in result.data.DISPLAY) {
-                angular.element('.current-price-'+coin).html(result.data.DISPLAY[coin].USD.PRICE);
-                angular.element('.market-cap-'+coin).html(result.data.DISPLAY[coin].USD.MKTCAP);
-                angular.element('.volumedayto-'+coin).html(result.data.DISPLAY[coin].USD.VOLUMEDAYTO);
-                angular.element('.supply-'+coin).html(result.data.DISPLAY[coin].USD.SUPPLY);
+                $scope.coins[coin].current_price = result.data.DISPLAY[coin].USD.PRICE;
+                $scope.coins[coin].market_cap = result.data.DISPLAY[coin].USD.MKTCAP;
+                $scope.coins[coin].volumedayto = result.data.DISPLAY[coin].USD.VOLUMEDAYTO;
+                $scope.coins[coin].supply = result.data.DISPLAY[coin].USD.SUPPLY;
+                $scope.coins[coin].change24hour = result.data.DISPLAY[coin].USD.CHANGE24HOUR;
 
-                var price_change = result.data.DISPLAY[coin].USD.CHANGE24HOUR;                
+                angular.element('.current-price-'+coin).html($scope.coins[coin].current_price);
+                angular.element('.market-cap-'+coin).html($scope.coins[coin].market_cap);
+                angular.element('.volumedayto-'+coin).html($scope.coins[coin].volumedayto);
+                angular.element('.supply-'+coin).html($scope.coins[coin].supply);
+
+                var price_change = $scope.coins[coin].change24hour;
                 angular.element('.change24hour-'+coin).html(price_change);
                 if (price_change.indexOf('-') > -1) {
                     angular.element('.change24hour-'+coin).addClass('text-danger');
@@ -189,21 +218,21 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         DTColumnBuilder.newColumn('current_price', 'Current Price').renderWith(function(data, type, full) {
             return `<span class="current-price-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('Id').withTitle('Market Cap').renderWith(function(data, type, full) {
-            return `<span class="market-cap-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
-        }),
-        DTColumnBuilder.newColumn('Id').withTitle('VOLUMEDAYTO').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('market_cap').withTitle('Market Cap').renderWith(function(data, type, full) {
+            return `<span class="market-cap-${full.Symbol}" cid="${full.Id}">-</span>`;
+        }).withOption('type', 'num-fmt'),
+        DTColumnBuilder.newColumn('volumedayto').withTitle('VOLUMEDAYTO').renderWith(function(data, type, full) {
             return `<span class="volumedayto-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('Id').withTitle('CHANGE24HOUR').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('change24hour').withTitle('CHANGE24HOUR').renderWith(function(data, type, full) {
             return `<span class="change24hour-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('Id').withTitle('SUPPLY').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('supply').withTitle('SUPPLY').renderWith(function(data, type, full) {
             return `<span class="supply-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
         }),
         DTColumnBuilder.newColumn('TotalCoinSupply', 'TotalCoinSupply').withOption('type', 'num-fmt'),
-        DTColumnBuilder.newColumn('Id').withTitle('Start Date'),
-        DTColumnBuilder.newColumn('Id').withTitle('Affiliate Links'),
+        DTColumnBuilder.newColumn('start_date').withTitle('Start Date'),
+        DTColumnBuilder.newColumn('affiliate').withTitle('Affiliate Links'),
         DTColumnBuilder.newColumn('search_vol').withTitle('Google Search Volume')
     ];
 });

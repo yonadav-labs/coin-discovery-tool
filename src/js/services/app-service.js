@@ -87,8 +87,12 @@ angular.module('app')
 
         var baseUrl = 'https://min-api.cryptocompare.com/';
 
-        this.get = function (endpoint) {
-            return $http.get(baseUrl + endpoint, { headers: { "Content-Type": 'text/plain' } });
+        this.get = function (endpoint, full) {
+            var url = baseUrl + endpoint;
+            if (full)
+                url = endpoint;
+
+            return $http.get(url, { headers: { "Content-Type": 'text/plain' } });
 
         }
 
