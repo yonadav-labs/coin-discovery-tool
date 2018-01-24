@@ -213,7 +213,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
                 }
             }
         });        
-    }).withOption('lengthMenu', [10, 25, 50]);
+    }).withOption('lengthMenu', [10, 25, 50]).withOption('rowCallback', rowCallback);
 
     $scope.dtColumns = [
         DTColumnBuilder.newColumn('SortOrder', 'Rank'),
@@ -245,4 +245,22 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         }),
         DTColumnBuilder.newColumn('search_vol').withTitle('Google Search Volume')
     ];
+
+    $scope.someClickHandler = someClickHandler;
+
+    function someClickHandler(info) {
+        $scope.price_param.coin = info.Symbol;
+        $scope.drawPriceHistory();
+    }
+
+    function rowCallback(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+        // Unbind first in order to avoid any duplicate handler (see https://github.com/l-lin/angular-datatables/issues/87)
+        $('td', nRow).unbind('click');
+        $('td', nRow).bind('click', function() {
+            $scope.$apply(function() {
+                $scope.someClickHandler(aData);
+            });
+        });
+        return nRow;
+    }    
 });
