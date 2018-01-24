@@ -130,6 +130,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         var defer = $q.defer();
         CorsRequest.get('data/all/coinlist').then(function(result) {
             $scope.coins = result.data.Data;
+            // console.log(Object.keys($scope.coins).join(','));
             $scope.symbol_list = [];
             var coinlist = [];
             for (var coin in $scope.coins) {
@@ -141,16 +142,19 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         return defer.promise;
     }).withLanguage({
         "oPaginate": {
-            "sNext":     ">",
-            "sPrevious": "<"
+            "sNext":     '<i class="fa fa-chevron-right" aria-hidden="true"></i>',
+            "sPrevious": '<i class="fa fa-chevron-left" aria-hidden="true"></i>'
         }
+    }).withOption('drawCallback', function(settings) {
+        console.log(settings);
     });
 
     vm.dtColumns = [
         DTColumnBuilder.newColumn('Id', 'ID'),
         DTColumnBuilder.newColumn('SortOrder', 'Rank'),
         DTColumnBuilder.newColumn('Name').withTitle('Name (symbol)').renderWith(function(data, type, full) {
-            return '<img width=24 style="margin-right:5px;" lazyload src="https://www.cryptocompare.com'+full.ImageUrl+'">'+full.Name;
+            return full.Name;
+            // return '<img width=24 style="margin-right:5px;" lazyload src="https://www.cryptocompare.com'+full.ImageUrl+'">'+full.Name;
         }),
         DTColumnBuilder.newColumn('CoinName').withTitle('Coin Name'),
         // DTColumnBuilder.newColumn('version', 'Current Price').renderWith(function(data, type, full) {
