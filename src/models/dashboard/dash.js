@@ -130,14 +130,17 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         var defer = $q.defer();
         CorsRequest.get('data/all/coinlist').then(function(result) {
             $scope.coins = result.data.Data;
-            // console.log(Object.keys($scope.coins).join(','));
-            $scope.symbol_list = [];
+            $scope.symbol_list = Object.keys($scope.coins);
+
             var coinlist = [];
             for (var coin in $scope.coins) {
                 coinlist.push($scope.coins[coin]);
-                $scope.symbol_list.push($scope.coins[coin].Symbol);
             }
+
             defer.resolve(coinlist);
+            // var sym_arr = $scope.symbol_list.join(',');
+            // CorsRequest.get(`data/pricemultifull?fsyms=${sym_arr}&tsyms=USD`).then(function(result) {
+            // });
         });
         return defer.promise;
     }).withLanguage({
@@ -146,15 +149,19 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
             "sPrevious": '<i class="fa fa-chevron-left" aria-hidden="true"></i>'
         }
     }).withOption('drawCallback', function(settings) {
-        console.log(settings);
+        // console.log(settings.nTBody.children);
+        for (i=0; i < settings.nTBody.children.length; i++) {
+            var attrs = settings.nTBody.children[i].children[1].innerHTML.split('@@@');
+            if (attrs.length > 1) {
+                settings.nTBody.children[i].children[1].innerHTML = '<img width=24 style="margin-right:5px;" src="https://www.cryptocompare.com'+attrs[0]+'">'+attrs[1];                
+            }
+        }
     });
 
     vm.dtColumns = [
-        DTColumnBuilder.newColumn('Id', 'ID'),
         DTColumnBuilder.newColumn('SortOrder', 'Rank'),
         DTColumnBuilder.newColumn('Name').withTitle('Name (symbol)').renderWith(function(data, type, full) {
-            return full.Name;
-            // return '<img width=24 style="margin-right:5px;" lazyload src="https://www.cryptocompare.com'+full.ImageUrl+'">'+full.Name;
+            return full.ImageUrl+'@@@'+full.Name;
         }),
         DTColumnBuilder.newColumn('CoinName').withTitle('Coin Name'),
         // DTColumnBuilder.newColumn('version', 'Current Price').renderWith(function(data, type, full) {
