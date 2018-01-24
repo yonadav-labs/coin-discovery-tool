@@ -147,7 +147,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
             "sPrevious": '<i class="fa fa-chevron-left" aria-hidden="true"></i>'
         }
     }).withOption('drawCallback', function(settings) {
-        console.log(settings.nTBody.children);
+        // console.log(settings.nTBody.children);
         var sym_arr = [];
         for (i=0; i < settings.nTBody.children.length; i++) {
             var attrs = settings.nTBody.children[i].children[1].innerHTML.split('@@@');
@@ -161,16 +161,8 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         
         CorsRequest.get(`data/pricemultifull?fsyms=${sym_arr}&tsyms=USD`).then(function(result) {
             for (var coin in result.data.DISPLAY) {
-                for (i=0; i<$scope.coinlist.length; i++) {
-                    if (coin == $scope.coinlist[i].Symbol) {
-                        $scope.coins[coin].current_price = result.data.DISPLAY[coin].USD.PRICE;
-                        $scope.coinlist[i].current_price = result.data.DISPLAY[coin].USD.PRICE;
-                    }                    
-                }
                 angular.element('.current-price-'+coin).html(result.data.DISPLAY[coin].USD.PRICE);
             }
-            // console.log($scope.coinlist);
-            // $scope.dtInstance.reloadData(); 
         });        
     });
 
