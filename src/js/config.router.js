@@ -60,8 +60,6 @@ angular.module('app')
   )
  
   .factory('ApiInterceptor', function($localStorage, $injector, $rootScope){
-
-    console.log('here')
       return {
         request: function(config) {
           

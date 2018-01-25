@@ -13,7 +13,6 @@ angular.module('app')
             return $http.post(baseUrl + endpoint, postData);
         }
 
-
         this.put = function (endpoint, postData) {
             return $http.put(baseUrl + endpoint, postData);
         }
@@ -84,7 +83,6 @@ angular.module('app')
     })
 
     .service('CorsRequest', function ($http) {
-
         var baseUrl = 'https://min-api.cryptocompare.com/';
 
         this.get = function (endpoint, full) {
@@ -93,14 +91,12 @@ angular.module('app')
                 url = endpoint;
 
             return $http.get(url, { headers: { "Content-Type": 'text/plain' } });
-
         }
 
         this.post = function (endpoint, postData) {
             return $http.post(baseUrl + endpoint, postData, { headers: { "Content-Type": 'text/plain' } });
         }
     })
-
 
     .factory('broadcastService', function ($rootScope) {
         return {
@@ -109,7 +105,6 @@ angular.module('app')
             }
         }
     })
-
 
     //COmplete user  service
     .factory('UserService', function (Request, $timeout, $http, $localStorage) {
@@ -173,7 +168,6 @@ angular.module('app')
         }
 
     })
-
 
     .directive('fileModel', ['$parse', function ($parse) {
         return {
