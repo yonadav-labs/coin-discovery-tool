@@ -1,96 +1,117 @@
-  <!-- main -->
-  <div class="col">
+<!-- main -->
+<div class="col">
     <!-- main header -->
     <div class="bg-light lter b-b wrapper-md">
-      <div class="row">
-        <div class="col-sm-6 col-xs-12">
-          <h1 class="m-n font-thin h3 text-black">Dashboard</h1>
-          <small class="text-muted">Watch Cryptocurrncy Trends </small>
+        <div class="row">
+            <div class="col-sm-6 col-xs-12">
+                <h1 class="m-n font-thin h3 text-black">Dashboard</h1>
+                <small class="text-muted">Watch Cryptocurrncy Trends </small>
+            </div>
         </div>
-      </div>
     </div>
     <!-- / main header -->
-    <div class="wrapper-md" >
-      <!-- stats -->
-      <div class="row">       
+    <div class="wrapper-md">
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <div class="wrapper">
+                    <div class="panel panel-default">
+                        <div class="panel-heading font-bold">
+                            <span class="btn btn-default btn-xs pull-right m-t-xs" ng-click="drawTrends()" style="margin-top: -3px; margin-right: -7px;"><i class="fa fa-refresh"></i></span> 
+                            Price
+                        </div>
+                        <div class="panel-body">
+                            <div class="coin-list">
+                                <label>Cryptocurrency: </label>
+                                <select ng-model="price_param.coin" ng-options="coin for coin in symbol_list" ng-change="drawTrends();">
+                                </select>
+                                <label style="margin-left: 15px;">Change: </label>
+                                <label ng-class="change > 0 ? 'text-success' : 'text-danger'"> 
+                                    <strong>{{ change | currency }}</strong> 
+                                </label>
+                            </div>
 
-    <div class="col-md-12 col-sm-12">       
-      <div class="wrapper">
-        <div class="panel panel-default">
-          <div class="panel-heading font-bold">
-              <span class="btn btn-default btn-xs pull-right m-t-xs" ng-click="drawTrends()" style="margin-top: -3px; margin-right: -7px;">
-                <i class="fa fa-refresh"></i>
-              </span>
+                            <div style="text-align:center" ng-if="loadingData" class="col-sm-12">
+                                <i class="fa fa-spin fa-spinner"></i> Loading Data
+                            </div>
 
-            Price
-          </div>
-          <div class="panel-body">
-            <div class="coin-list">
-              <label>Cryptocurrency: </label>
-              <select ng-model="price_param.coin" ng-options="coin for coin in symbol_list" ng-change="drawTrends();">
-              </select> 
-              <label style="margin-left: 15px;">Change: </label>
-              <label ng-class="change > 0 ? 'text-success' : 'text-danger'"> 
-                <strong>{{ change | currency }}</strong> 
-              </label>
-            </div>
-
-            <div style="text-align:center" ng-if="loadingData" class="col-sm-12">
-              <i class="fa fa-spin fa-spinner"></i>
-                Loading Data
-            </div>
-
-            <div id="chart-user" class ="col-sm-12" style="height:400px;padding:0px 30px">
-            </div>
-            <div class="clearfix"></div>
-            <div class="m-b-sm">
-              <center  style="margin-top: 15px">
-                <div class="btn-group" ng-init="radioModel = 'Day'">
-                  <label ng-click="price_param.period=24;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel"
-                    btn-radio="'Day'" aria-invalid="false">
-                    <i class="fa fa-check text-active"></i> Last 24 Hours</label>
-                  <label ng-click="price_param.period=150;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty active ng-valid-parse"
-                    ng-model="radioModel" btn-radio="'Week'" aria-invalid="false">
-                    <i class="fa fa-check text-active"></i> Last Week</label>
-                  <label ng-click="price_param.period=720;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel"
-                    btn-radio="'Month'" aria-invalid="false">
-                    <i class="fa fa-check text-active"></i> Last Month</label>
-                  <label ng-click="price_param.period=2000;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel"
-                    btn-radio="'3 Months'" aria-invalid="false">
-                    <i class="fa fa-check text-active"></i> Last 3 Months</label>
-                  <label ng-click="price_param.period=180;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel"
-                    btn-radio="'6 Months'" aria-invalid="false">
-                    <i class="fa fa-check text-active"></i> Last 6 Months</label>
-                  <label ng-click="price_param.period=365;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel"
-                    btn-radio="'Year'" aria-invalid="false">
-                    <i class="fa fa-check text-active"></i> Last Year</label>
+                            <div id="chart-user" class="col-sm-12" style="height:300px;padding:0px 30px">
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="m-b-sm">
+                                <center style="margin-top: 15px">
+                                    <div class="btn-group" ng-init="radioModel = 'Day'">
+                                        <label ng-click="price_param.period=24;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel" btn-radio="'Day'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 24 Hours</label>
+                                        <label ng-click="price_param.period=150;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty active ng-valid-parse" ng-model="radioModel" btn-radio="'Week'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last Week</label>
+                                        <label ng-click="price_param.period=720;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel" btn-radio="'Month'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last Month</label>
+                                        <label ng-click="price_param.period=2000;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel" btn-radio="'3 Months'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 3 Months</label>
+                                        <label ng-click="price_param.period=180;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel" btn-radio="'6 Months'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 6 Months</label>
+                                        <label ng-click="price_param.period=365;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel" btn-radio="'Year'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last Year</label>
+                                    </div>
+                                </center>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </center>
             </div>
-          </div>
-        </div>
-        <!-- END PORTLET-->
-      </div>
 
-  </div>
-  <div class="col-md-12 col-sm-12">       
-    <div class="wrapper">
-      <div class="panel panel-default">
-        <div class="panel-heading font-bold">
-            <span class="btn btn-default btn-xs pull-right m-t-xs" ng-click="drawTrends()" style="margin-top: -3px; margin-right: -7px;">
-              <i class="fa fa-refresh"></i>
-            </span>
+            <div class="col-md-12 col-sm-12">
+                <div class="wrapper">
+                    <div class="panel panel-default">
+                        <div class="panel-heading font-bold">
+                            <span class="btn btn-default btn-xs pull-right m-t-xs" ng-click="drawTrends()" style="margin-top: -3px; margin-right: -7px;"><i class="fa fa-refresh"></i></span> 
+                            Google Search Volume
+                        </div>
+                        <div class="panel-body">
+                            <div class="coin-list">
+                                <label>Cryptocurrency: </label>
+                                <select ng-model="price_param.coin" ng-options="coin for coin in symbol_list" ng-change="drawTrends();">
+                                </select>
+                                <label style="margin-left: 15px;">Change: </label>
+                                <label ng-class="search_change > 0 ? 'text-success' : 'text-danger'"> 
+                                    <strong>{{ search_change }}</strong> 
+                                </label>
+                            </div>
 
-          Coin List
+                            <div style="text-align:center" ng-if="loadingData" class="col-sm-12">
+                                <i class="fa fa-spin fa-spinner"></i> Loading Data
+                            </div>
+
+                            <div id="chart-search" class="col-sm-12" style="height:250px;padding:0px 30px">
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="m-b-sm">
+                                <center style="margin-top: 15px">
+                                    <div class="btn-group" ng-init="radioModel = 'Day'">
+                                        <label ng-click="price_param.period=24;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel" btn-radio="'Day'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 24 Hours</label>
+                                        <label ng-click="price_param.period=150;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty active ng-valid-parse" ng-model="radioModel" btn-radio="'Week'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last Week</label>
+                                        <label ng-click="price_param.period=720;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel" btn-radio="'Month'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last Month</label>
+                                        <label ng-click="price_param.period=2000;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel" btn-radio="'3 Months'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 3 Months</label>
+                                        <label ng-click="price_param.period=180;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel" btn-radio="'6 Months'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 6 Months</label>
+                                        <label ng-click="price_param.period=365;drawTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel" btn-radio="'Year'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last Year</label>
+                                    </div>
+                                </center>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 col-sm-12">
+                <div class="wrapper">
+                    <div class="panel panel-default">
+                        <div class="panel-heading font-bold">
+                            <span class="btn btn-default btn-xs pull-right m-t-xs" ng-click="drawTrends()" style="margin-top: -3px; margin-right: -7px;">
+                                <i class="fa fa-refresh"></i>
+                            </span> Coin List
+                        </div>
+                        <div class="panel-body">
+                            <div>
+                                <table datatable="" dt-options="dtOptions" dt-columns="dtColumns" class="table table-striped table-responsive"></table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="panel-body">
-          <div>
-              <table datatable="" dt-options="dtOptions" dt-columns="dtColumns" class="table table-striped table-responsive"></table>
-          </div>        
-        </div>
-      </div>
     </div>
-  </div>
-</div>
-</div>
 </div>

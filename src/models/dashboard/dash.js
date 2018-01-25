@@ -7,8 +7,8 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
 
     $scope.symbol_list = ['BTC'];
 
-    $scope.drawChart = function(dataSets, minPeriod) {
-        var chart = AmCharts.makeChart( "chart-user", {
+    $scope.drawChart = function(dataSets, minPeriod, holder) {
+        var chart = AmCharts.makeChart( holder, {
             "type": "stock",
             "hideCredits": true,
 
@@ -99,14 +99,37 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         return chartData;
     }
 
+    $scope.generateDataSetsSearch = function(rawChartData) {        
+        return [{
+            "color": "blue",
+            "fieldMappings": [ {
+              "fromField": "value",
+              "toField": "value"
+            }, {
+              "fromField": "volume",
+              "toField": "volume"
+            } ],
+
+            "dataProvider": rawChartData,
+            "categoryField": "date",
+            "title": $scope.price_param.coin
+        }];
+    }
+
     function drawPriceHistory(r) {
         $scope.loadingData = false;
         $scope.change = r.data.Data[$scope.price_param.period].close - r.data.Data[0].close;
 
         var dataSets = $scope.generateDataSets([{...r.data}]);
-        $scope.drawChart(dataSets, 'ss');
+        $scope.drawChart(dataSets, 'ss', "chart-user");
+    }
 
-        Utill.endLoader();
+    function drawSearchTrend(r) {
+        $scope.loadingData = false;
+        $scope.search_change = r.data[r.data.length-1].value - r.data[0].value;
+
+        var dataSets = $scope.generateDataSetsSearch(r.data);
+        $scope.drawChart(dataSets, 'ss', 'chart-search');
     }
 
     $scope.drawTrends = () => {
@@ -116,6 +139,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
             url = `data/histoday?fsym=${$scope.price_param.coin}&tsym=USD&limit=${$scope.price_param.period}`;
 
         CorsRequest.get(url).then(drawPriceHistory);
+        Request.get(`getTrends/${$scope.price_param.coin}/${$scope.price_param.period}`).then(drawSearchTrend);
     };
 
     $scope.drawTrends();
