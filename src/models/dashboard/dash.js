@@ -238,7 +238,10 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         DTColumnBuilder.newColumn('affiliate').withTitle('Website').renderWith(function(data, type, full) {
             return `<span class="affiliate-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('search_vol').withTitle('Google Search Volume')
+        DTColumnBuilder.newColumn('search_vol').withTitle('Google Search Volume'),
+        DTColumnBuilder.newColumn('search_vol').withTitle('Search Volume Change'),
+        DTColumnBuilder.newColumn('search_vol').withTitle('Search Volume Change %'),
+        DTColumnBuilder.newColumn('search_vol').withTitle('Discussion Link')
     ];
 
     $scope.someClickHandler = someClickHandler;
