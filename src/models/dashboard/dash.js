@@ -99,20 +99,26 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         return chartData;
     }
 
-    $scope.drawPriceHistory = () => {
+    function drawPriceHistory(r) {
+        $scope.loadingData = false;
+        $scope.change = r.data.Data[$scope.price_param.period].close - r.data.Data[0].close;
+
+        var dataSets = $scope.generateDataSets([{...r.data}]);
+        $scope.drawChart(dataSets, 'ss');
+
+        Utill.endLoader();
+    }
+
+    $scope.drawTrends = () => {
         $scope.loadingData = true;
-        CorsRequest.get(`data/histohour?fsym=${$scope.price_param.coin}&tsym=USD&limit=${$scope.price_param.period}`).then(function (r) {
-            $scope.loadingData = false;
-            $scope.change = r.data.Data[$scope.price_param.period].close - r.data.Data[0].close;
+        var url = `data/histohour?fsym=${$scope.price_param.coin}&tsym=USD&limit=${$scope.price_param.period}`;
+        if ($scope.price_param.period == 180 || $scope.price_param.period == 365) 
+            url = `data/histoday?fsym=${$scope.price_param.coin}&tsym=USD&limit=${$scope.price_param.period}`;
 
-            var dataSets = $scope.generateDataSets([{...r.data}]);
-            $scope.drawChart(dataSets, 'ss');
-
-            Utill.endLoader();
-        });
+        CorsRequest.get(url).then(drawPriceHistory);
     };
 
-    $scope.drawPriceHistory();
+    $scope.drawTrends();
 
     $scope.$on("$destroy", function () {
         if (angular.isDefined($scope.interval)) {
@@ -248,7 +254,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
 
     function someClickHandler(info) {
         $scope.price_param.coin = info.Symbol;
-        $scope.drawPriceHistory();
+        $scope.drawTrends();
     }
 
     function rowCallback(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
