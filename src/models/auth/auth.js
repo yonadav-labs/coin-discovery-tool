@@ -44,13 +44,11 @@ app.controller('RegistrationCtrl', function ($scope, Request, $rootScope, $timeo
     $scope.signup = () => {
         $scope.showLoader = true;
         // $scope.postData.username = $scope.postData.email;
-        console.log($scope.postData)
         Request.post('rest-auth/registration/', $scope.postData).then((res) => {
             console.log(res.data);
             console.log(res);
-            $state.go('access.go-to-confirm');
+            $state.go('access.signin');
             HoldOn.close();
-
         }, (res) => {
             console.log(res);
             $scope.errors = res.data;
@@ -78,7 +76,7 @@ app.controller('ForgotCtrl', function ($scope, Request, $timeout, $state) {
             HoldOn.close();
             $scope.errors = res.data;
         });
-        
+
         $timeout(() => {
             $scope.messages.success = '';
             $scope.messages.error = '';

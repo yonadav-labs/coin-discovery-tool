@@ -105,6 +105,12 @@ angular.module('app')
                         controller: 'LoginCtrl'
                     })
 
+                    .state('access.signup', {
+                        url: '/signup/',
+                        templateUrl: 'models/auth/signup.html',
+                        controller: 'RegistrationCtrl'
+                    })
+
                     .state('access.go-to-confirm', {
                         url: '/email-confirmation',
                         templateUrl: 'models/auth/go-to-confirm.html',
@@ -135,7 +141,6 @@ angular.module('app')
                         data: {
                             requiredLogin: true
                         }
-
                     })
 
                     .state('access.unapproved', {
