@@ -74,9 +74,10 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         chartData = rawChartData.map(function(item) {
             var chartData = [];
             chartData = item.Data.map(function(item){
+                var d = new Date();
                 return {
                     // "date": moment(item.time).format('YY-MM-DD HH-MM-SS'),
-                    "date": new Date(+item.time *1000),
+                    "date": new Date(+item.time *1000 + d.getTimezoneOffset()*60*1000),
                     "value": item.close,
                     "volume": Math.round( Math.random() * 22 )
                 };
@@ -213,7 +214,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
                 $scope.coins[coin].affiliate = result.data.Data.General.AffiliateUrl;
                 $scope.coins[coin].start_date = result.data.Data.General.StartDate;
 
-                angular.element('.affiliate-'+coin).html('<a target="_blank" style="color: blue;" href="'+$scope.coins[coin].affiliate+'">'+$scope.coins[coin].affiliate+'</a>');
+                angular.element('.affiliate-'+coin).html('<a target="_blank" style="color: blue;" href="'+$scope.coins[coin].affiliate+'">'+$scope.coins[coin].affiliate.split('//')[1].replace('/', '')+'</a>');
                 angular.element('.start-date-'+coin).html($scope.coins[coin].start_date);
             }, function(err) {
                 console.log('########');
@@ -225,7 +226,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
                     coin_ = coin.replace('*', ''),
                     vol = result.data[result.data.length-1].value,
                     vol_change = result.data[result.data.length-1].value - result.data[result.data.length-2].value;
-                    vol_change_pro = (vol_change * 100 / vol).toFixed(2),
+                    vol_change_pro = vol ? (vol_change * 100 / vol).toFixed(2) : 0,
 
                 $scope.coins[coin].search_vol = vol;
                 $scope.coins[coin].search_vol_change = vol_change;
