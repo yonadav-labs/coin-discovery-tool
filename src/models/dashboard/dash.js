@@ -161,13 +161,14 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
             $scope.coinlist = [];
             for (var coin in $scope.coins) {                
                 $scope.coins[coin].current_price = '-';
-                $scope.coins[coin].search_vol = '-';
                 $scope.coins[coin].start_date = '-';
                 $scope.coins[coin].affiliate = '-';
                 $scope.coins[coin].market_cap = '-';
                 $scope.coins[coin].volumedayto = '-';
                 $scope.coins[coin].change24hour = '-';
                 $scope.coins[coin].supply = '-';
+                $scope.coins[coin].search_vol = '-';
+                $scope.coins[coin].search_vol_change = '-';
 
                 $scope.coinlist.push($scope.coins[coin]);
             }
@@ -185,7 +186,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         var sym_arr = [],
             sym_arr_str,
             cid_arr = [];
-        for (i=0; i < settings.nTBody.children.length; i++) {
+        for (i = 0; i < settings.nTBody.children.length; i++) {
             var url = settings.nTBody.children[i].children[1].children[0].attributes[0].value,
                 name = settings.nTBody.children[i].children[1].children[0].attributes[1].value,
                 symbol = settings.nTBody.children[i].children[3].children[0].attributes[1].value,
@@ -201,7 +202,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         sym_arr_str = sym_arr.join(',');
         if (!sym_arr_str) return;
 
-        for (i=0; i<cid_arr.length; i++) {
+        for (i = 0; i < cid_arr.length; i++) {
             var cid = cid_arr[i],
                 sym = sym_arr[i];
 
@@ -219,13 +220,25 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
             });
 
             Request.get(`getTrends/${sym}/90`).then(function(result) {
-                var coin = result.config.url.split('/')[6],
-                    vol = 0;
+                var coin = result.config.url.split('/')[6]
+                    coin_ = coin.replace('*', ''),
+                    vol = 0,
+                    vol_change = result.data[result.data.length-1].value - result.data[0].value;
+
                 for (i = 0; i < result.data.length; i++)
                     vol = vol + result.data[i].value;
 
                 $scope.coins[coin].search_vol = vol;
-                angular.element('.search-vol-'+coin.replace('*', '')).html(vol);
+                $scope.coins[coin].search_vol_change = vol_change;
+
+                angular.element('.search-vol-'+coin_).html(vol);
+                angular.element('.search-vol-change-'+coin_).html(vol_change);
+                if (vol_change < 0) {
+                    angular.element('.search-vol-change-'+coin_).addClass('text-danger');
+                } else {
+                    angular.element('.search-vol-change-'+coin_).addClass('text-success');
+                }
+
             });
         }
 
@@ -284,9 +297,9 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         DTColumnBuilder.newColumn('search_vol').withTitle('Google Search Volume').renderWith(function(data, type, full) {
             return `<span class="search-vol-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('search_vol').withTitle('Search Volume Change'),
-        DTColumnBuilder.newColumn('search_vol').withTitle('Search Volume Change %'),
-        DTColumnBuilder.newColumn('search_vol').withTitle('Discussion Link')
+        DTColumnBuilder.newColumn('search_vol_change').withTitle('Search Volume Change').withTitle('Google Search Volume').renderWith(function(data, type, full) {
+            return `<span class="search-vol-change-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
+        })
     ];
 
     $scope.someClickHandler = someClickHandler;
