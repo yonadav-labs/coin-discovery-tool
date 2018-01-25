@@ -135,7 +135,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
     $scope.drawTrends = () => {
         $scope.loadingData = true;
         var url = `data/histohour?fsym=${$scope.price_param.coin}&tsym=USD&limit=${$scope.price_param.period}`;
-        if ($scope.price_param.period == 180 || $scope.price_param.period == 365) 
+        if ([90, 180, 365].indexOf($scope.price_param.period) > -1) 
             url = `data/histoday?fsym=${$scope.price_param.coin}&tsym=USD&limit=${$scope.price_param.period}`;
 
         CorsRequest.get(url).then(drawPriceHistory);
@@ -183,6 +183,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
     }).withOption('drawCallback', function(settings) {
         // console.log(settings.nTBody.children);
         var sym_arr = [],
+            sym_arr_str,
             cid_arr = [];
         for (i=0; i < settings.nTBody.children.length; i++) {
             var url = settings.nTBody.children[i].children[1].children[0].attributes[0].value,
@@ -197,11 +198,13 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
             }
         }
 
-        sym_arr = sym_arr.join(',');
-        if (!sym_arr) return;
+        sym_arr_str = sym_arr.join(',');
+        if (!sym_arr_str) return;
 
         for (i=0; i<cid_arr.length; i++) {
-            var cid = cid_arr[i];
+            var cid = cid_arr[i],
+                sym = sym_arr[i];
+
             CorsRequest.get(`https://www.cryptocompare.com/api/data/coinsnapshotfullbyid/?id=${cid}`, true).then(function(result) {
                 var coin = result.data.Data.General.Symbol;
                 
@@ -214,9 +217,19 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
                 console.log('########');
                 console.log(err);
             });
+
+            Request.get(`getTrends/${sym}/90`).then(function(result) {
+                var coin = result.config.url.split('/')[6],
+                    vol = 0;
+                for (i = 0; i < result.data.length; i++)
+                    vol = vol + result.data[i].value;
+
+                $scope.coins[coin].search_vol = vol;
+                angular.element('.search-vol-'+coin.replace('*', '')).html(vol);
+            });
         }
 
-        CorsRequest.get(`data/pricemultifull?fsyms=${sym_arr}&tsyms=USD`).then(function(result) {
+        CorsRequest.get(`data/pricemultifull?fsyms=${sym_arr_str}&tsyms=USD`).then(function(result) {
             for (var coin in result.data.DISPLAY) {
                 $scope.coins[coin].current_price = result.data.DISPLAY[coin].USD.PRICE;
                 $scope.coins[coin].market_cap = result.data.DISPLAY[coin].USD.MKTCAP;
@@ -247,28 +260,30 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         }).withOption('type', 'string'),
         DTColumnBuilder.newColumn('FullName').withTitle('Coin Name'),
         DTColumnBuilder.newColumn('current_price', 'Current Price').renderWith(function(data, type, full) {
-            return `<span class="current-price-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
+            return `<span class="current-price-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
         DTColumnBuilder.newColumn('market_cap').withTitle('Market Cap').renderWith(function(data, type, full) {
-            return `<span class="market-cap-${full.Symbol}" cid="${full.Id}">-</span>`;
+            return `<span class="market-cap-${full.Symbol.replace('*', '')}" cid="${full.Id}">-</span>`;
         }).withOption('type', 'num-fmt'),
         DTColumnBuilder.newColumn('volumedayto').withTitle('VOLUMEDAYTO').renderWith(function(data, type, full) {
-            return `<span class="volumedayto-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
+            return `<span class="volumedayto-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
         DTColumnBuilder.newColumn('change24hour').withTitle('CHANGE24HOUR').renderWith(function(data, type, full) {
-            return `<span class="change24hour-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
+            return `<span class="change24hour-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
         DTColumnBuilder.newColumn('supply').withTitle('SUPPLY').renderWith(function(data, type, full) {
-            return `<span class="supply-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
+            return `<span class="supply-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
         DTColumnBuilder.newColumn('TotalCoinSupply', 'TotalCoinSupply').withOption('type', 'num-fmt'),
         DTColumnBuilder.newColumn('start_date').withTitle('Start Date').renderWith(function(data, type, full) {
-            return `<span class="start-date-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
+            return `<span class="start-date-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
         DTColumnBuilder.newColumn('affiliate').withTitle('Website').renderWith(function(data, type, full) {
-            return `<span class="affiliate-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
+            return `<span class="affiliate-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('search_vol').withTitle('Google Search Volume'),
+        DTColumnBuilder.newColumn('search_vol').withTitle('Google Search Volume').renderWith(function(data, type, full) {
+            return `<span class="search-vol-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
+        }),
         DTColumnBuilder.newColumn('search_vol').withTitle('Search Volume Change'),
         DTColumnBuilder.newColumn('search_vol').withTitle('Search Volume Change %'),
         DTColumnBuilder.newColumn('search_vol').withTitle('Discussion Link')
