@@ -169,6 +169,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
                 $scope.coins[coin].supply = '-';
                 $scope.coins[coin].search_vol = '-';
                 $scope.coins[coin].search_vol_change = '-';
+                $scope.coins[coin].search_vol_change_pro = '-';
 
                 $scope.coinlist.push($scope.coins[coin]);
             }
@@ -219,26 +220,36 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
                 console.log(err);
             });
 
-            Request.get(`getTrends/${sym}/90`).then(function(result) {
+            Request.get(`getTrends/${sym}/24`).then(function(result) {
                 var coin = result.config.url.split('/')[6]
                     coin_ = coin.replace('*', ''),
                     vol = 0,
+                    vol_change_pro = 0,
                     vol_change = result.data[result.data.length-1].value - result.data[0].value;
 
                 for (i = 0; i < result.data.length; i++)
                     vol = vol + result.data[i].value;
 
+                vol_change_pro = (vol_change * 100 / vol).toFixed(2);
                 $scope.coins[coin].search_vol = vol;
                 $scope.coins[coin].search_vol_change = vol_change;
+                $scope.coins[coin].search_vol_change_pro = vol_change_pro;
 
                 angular.element('.search-vol-'+coin_).html(vol);
                 angular.element('.search-vol-change-'+coin_).html(vol_change);
+                angular.element('.search-vol-change-pro-'+coin_).html(vol_change_pro);
+
                 if (vol_change < 0) {
                     angular.element('.search-vol-change-'+coin_).addClass('text-danger');
                 } else {
                     angular.element('.search-vol-change-'+coin_).addClass('text-success');
                 }
 
+                if (vol_change_pro < 0) {
+                    angular.element('.search-vol-change-pro-'+coin_).addClass('text-danger');
+                } else {
+                    angular.element('.search-vol-change-pro-'+coin_).addClass('text-success');
+                }
             });
         }
 
@@ -278,16 +289,16 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         DTColumnBuilder.newColumn('market_cap').withTitle('Market Cap').renderWith(function(data, type, full) {
             return `<span class="market-cap-${full.Symbol.replace('*', '')}" cid="${full.Id}">-</span>`;
         }).withOption('type', 'num-fmt'),
-        DTColumnBuilder.newColumn('volumedayto').withTitle('VOLUMEDAYTO').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('volumedayto').withTitle('Volume Day To').renderWith(function(data, type, full) {
             return `<span class="volumedayto-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('change24hour').withTitle('CHANGE24HOUR').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('change24hour').withTitle('Change 24 Hour').renderWith(function(data, type, full) {
             return `<span class="change24hour-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('supply').withTitle('SUPPLY').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('supply').withTitle('Supply').renderWith(function(data, type, full) {
             return `<span class="supply-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('TotalCoinSupply', 'TotalCoinSupply').withOption('type', 'num-fmt'),
+        DTColumnBuilder.newColumn('TotalCoinSupply', 'Total Coin Supply').withOption('type', 'num-fmt'),
         DTColumnBuilder.newColumn('start_date').withTitle('Start Date').renderWith(function(data, type, full) {
             return `<span class="start-date-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
@@ -297,9 +308,13 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         DTColumnBuilder.newColumn('search_vol').withTitle('Google Search Volume').renderWith(function(data, type, full) {
             return `<span class="search-vol-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('search_vol_change').withTitle('Search Volume Change').withTitle('Google Search Volume').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('search_vol_change').withTitle('Search Volume Change').renderWith(function(data, type, full) {
             return `<span class="search-vol-change-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
-        })
+        }),
+        DTColumnBuilder.newColumn('search_vol_change_pro').withTitle('Search Volume Change %').renderWith(function(data, type, full) {
+            return `<span class="search-vol-change-pro-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
+        }),
+        DTColumnBuilder.newColumn('search_vol').withTitle('Discussion Link')
     ];
 
     $scope.someClickHandler = someClickHandler;
