@@ -31,7 +31,6 @@ angular.module('app')
 
         }
 
-
         $rootScope.$on('$stateChangeStart', function (event, toState) {
             $rootScope.currentUserToken = UserService.getCurrentUserToken();
             $rootScope.currentUser = UserService.getCurrentUser();

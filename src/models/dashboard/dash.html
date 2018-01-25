@@ -28,7 +28,11 @@
             <div class="coin-list">
               <label>Cryptocurrency: </label>
               <select ng-model="price_param.coin" ng-options="coin for coin in symbol_list" ng-change="drawPriceHistory();">
-              </select>              
+              </select> 
+              <label style="margin-left: 15px;">Change: </label>
+              <label ng-class="change > 0 ? 'text-success' : 'text-danger'"> 
+                <strong>{{ change | currency }}</strong> 
+              </label>
             </div>
 
             <div style="text-align:center" ng-if="loadingData" class="col-sm-12">
@@ -51,6 +55,9 @@
                   <label ng-click="price_param.period=720;drawPriceHistory();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel"
                     btn-radio="'Month'" aria-invalid="false">
                     <i class="fa fa-check text-active"></i> Last Month</label>
+                  <label ng-click="price_param.period=2000;drawPriceHistory();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel"
+                    btn-radio="'3 Months'" aria-invalid="false">
+                    <i class="fa fa-check text-active"></i> Last 3 Months</label>
                 </div>
               </center>
             </div>

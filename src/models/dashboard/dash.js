@@ -69,9 +69,9 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         chart.validateData();
     }
 
-    $scope.generateDataSets = function() {
+    $scope.generateDataSets = function(rawChartData) {
         var dataSets = [];
-        chartData = $scope.rawChartData.map(function(item) {
+        chartData = rawChartData.map(function(item) {
             var chartData = [];
             chartData = item.Data.map(function(item){
                 return {
@@ -93,7 +93,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
 
                 "dataProvider": chartData,
                 "categoryField": "date",
-                "title": item.asset
+                "title": $scope.price_param.coin
             }
         })
         return chartData;
@@ -102,19 +102,14 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
     $scope.drawPriceHistory = () => {
         $scope.loadingData = true;
         CorsRequest.get(`data/histohour?fsym=${$scope.price_param.coin}&tsym=USD&limit=${$scope.price_param.period}`).then(function (r) {
-                $scope.loadingData = false;
-                var assetname = r.config.url;
-                assetname = assetname.slice(assetname.indexOf('fsym'));
-                assetname = assetname.slice(0, assetname.indexOf('&'));
-                assetname = assetname.slice(5);
+            $scope.loadingData = false;
+            $scope.change = r.data.Data[$scope.price_param.period].close - r.data.Data[0].close;
 
-                $scope.rawChartData = [{...r.data, asset: assetname}]; 
-                var dataSets = $scope.generateDataSets();
-                $scope.drawChart(dataSets, 'ss');
+            var dataSets = $scope.generateDataSets([{...r.data}]);
+            $scope.drawChart(dataSets, 'ss');
 
-                Utill.endLoader();
-            }
-        );
+            Utill.endLoader();
+        });
     };
 
     $scope.drawPriceHistory();
@@ -240,7 +235,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         DTColumnBuilder.newColumn('start_date').withTitle('Start Date').renderWith(function(data, type, full) {
             return `<span class="start-date-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('affiliate').withTitle('Affiliate Links').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('affiliate').withTitle('Website').renderWith(function(data, type, full) {
             return `<span class="affiliate-${full.Symbol}" symbol="${full.Symbol}">-</span>`;
         }),
         DTColumnBuilder.newColumn('search_vol').withTitle('Google Search Volume')
