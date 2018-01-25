@@ -223,21 +223,17 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
             Request.get(`getTrends/${sym}/24`).then(function(result) {
                 var coin = result.config.url.split('/')[6]
                     coin_ = coin.replace('*', ''),
-                    vol = 0,
-                    vol_change_pro = 0,
-                    vol_change = result.data[result.data.length-1].value - result.data[0].value;
+                    vol = result.data[result.data.length-1].value,
+                    vol_change = result.data[result.data.length-1].value - result.data[result.data.length-2].value;
+                    vol_change_pro = (vol_change * 100 / vol).toFixed(2),
 
-                for (i = 0; i < result.data.length; i++)
-                    vol = vol + result.data[i].value;
-
-                vol_change_pro = (vol_change * 100 / vol).toFixed(2);
                 $scope.coins[coin].search_vol = vol;
                 $scope.coins[coin].search_vol_change = vol_change;
                 $scope.coins[coin].search_vol_change_pro = vol_change_pro;
 
                 angular.element('.search-vol-'+coin_).html(vol);
                 angular.element('.search-vol-change-'+coin_).html(vol_change);
-                angular.element('.search-vol-change-pro-'+coin_).html(vol_change_pro);
+                angular.element('.search-vol-change-pro-'+coin_).html(vol_change_pro+'%');
 
                 if (vol_change < 0) {
                     angular.element('.search-vol-change-'+coin_).addClass('text-danger');
