@@ -2,7 +2,8 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
     $scope.loadingData = false;
     $scope.price_param = {
         coin: 'BTC',
-        period: 24      // day
+        period: 24,      // day
+        custom: ''
     };
 
     $scope.symbol_list = ['BTC'];
@@ -141,6 +142,18 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
 
         CorsRequest.get(url).then(drawPriceHistory);
         Request.get(`getTrends/${$scope.price_param.coin}/${$scope.price_param.period}`).then(drawSearchTrend);
+    };
+
+    $scope.drawCustomTrends = () => {
+        if ($scope.price_param.custom.trim()) {
+            $scope.loadingData = true;
+            Request.get(`getTrends/${$scope.price_param.custom}/${$scope.price_param.period}`).then(function(r) {
+                $scope.loadingData = false;
+
+                var dataSets = $scope.generateDataSetsSearch(r.data);
+                $scope.drawChart(dataSets, 'ss', 'chart-search-custom');            
+            });            
+        }
     };
 
     $scope.drawTrends();

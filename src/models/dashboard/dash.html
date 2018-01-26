@@ -100,6 +100,43 @@
                 <div class="wrapper">
                     <div class="panel panel-default">
                         <div class="panel-heading font-bold">
+                            <span class="btn btn-default btn-xs pull-right m-t-xs" ng-click="drawTrends()" style="margin-top: -3px; margin-right: -7px;"><i class="fa fa-refresh"></i></span> 
+                            Custom Google Search Volume
+                        </div>
+                        <div class="panel-body">
+                            <div class="coin-list">
+                                <label>Keyword: </label>
+                                <input ng-model="price_param.custom" style="color: black;" ng-change="drawCustomTrends();">
+                            </div>
+
+                            <div style="text-align:center" ng-if="loadingData" class="col-sm-12">
+                                <i class="fa fa-spin fa-spinner"></i> Loading Data
+                            </div>
+
+                            <div id="chart-search-custom" class="col-sm-12" style="height:220px;padding:0px 30px">
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="m-b-sm">
+                                <center style="margin-top: 15px">
+                                    <div class="btn-group" ng-init="price_param.period = 24">
+                                        <label ng-click="drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="price_param.period" btn-radio="24" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 24 Hours</label>
+                                        <label ng-click="drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty active ng-valid-parse" ng-model="price_param.period" btn-radio="150" aria-invalid="false"><i class="fa fa-check text-active"></i> Last Week</label>
+                                        <label ng-click="drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="price_param.period" btn-radio="720" aria-invalid="false"><i class="fa fa-check text-active"></i> Last Month</label>
+                                        <label ng-click="drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="price_param.period" btn-radio="90" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 3 Months</label>
+                                        <label ng-click="drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="price_param.period" btn-radio="180" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 6 Months</label>
+                                        <label ng-click="drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="price_param.period" btn-radio="365" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 12 Months</label>
+                                    </div>
+                                </center>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 col-sm-12">
+                <div class="wrapper">
+                    <div class="panel panel-default">
+                        <div class="panel-heading font-bold">
                             <span class="btn btn-default btn-xs pull-right m-t-xs" ng-click="drawTrends()" style="margin-top: -3px; margin-right: -7px;">
                                 <i class="fa fa-refresh"></i>
                             </span> Coin List
