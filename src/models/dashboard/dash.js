@@ -151,6 +151,22 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         }
     });
 
+    $scope.formatNumber = function(num, prefix) {
+        // console.log(num);
+        if (!num)
+            return '-';
+
+        var suffix = '';
+        if (num >= 1000000000) {
+            num = num / 1000000000;
+            suffix = 'B';
+        } else if (num >= 1000000) {
+            num = num / 1000000;
+            suffix = 'M';
+        }
+        return prefix + ' ' + Number(num.toFixed(2)).toLocaleString() + ' ' + suffix;
+    }
+
     $scope.dtInstance = {};
 
     $scope.dtOptions = DTOptionsBuilder.fromFnPromise(function() {
@@ -171,6 +187,12 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
                 $scope.coins[coin].search_vol = '-';
                 $scope.coins[coin].search_vol_change = '-';
                 $scope.coins[coin].search_vol_change_pro = '-';
+
+                if (isNaN(Number($scope.coins[coin].TotalCoinSupply))) {
+                    $scope.coins[coin].TotalCoinSupply = 0
+                } else {
+                    $scope.coins[coin].TotalCoinSupply = $scope.formatNumber(Number($scope.coins[coin].TotalCoinSupply), '')
+                }
 
                 $scope.coinlist.push($scope.coins[coin]);
             }
@@ -209,12 +231,14 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
                 sym = sym_arr[i];
 
             CorsRequest.get(`https://www.cryptocompare.com/api/data/coinsnapshotfullbyid/?id=${cid}`, true).then(function(result) {
-                var coin = result.data.Data.General.Symbol;
+                var coin = result.data.Data.General.Symbol,
+                    sdates = result.data.Data.General.StartDate.split('/');
                 
                 $scope.coins[coin].affiliate = result.data.Data.General.AffiliateUrl;
-                $scope.coins[coin].start_date = result.data.Data.General.StartDate;
 
-                angular.element('.affiliate-'+coin).html('<a target="_blank" style="color: blue;" href="'+$scope.coins[coin].affiliate+'">'+$scope.coins[coin].affiliate.split('//')[1].replace('/', '')+'</a>');
+                $scope.coins[coin].start_date = sdates[1]+'/'+sdates[0]+'/'+sdates[2];
+                if (result.data.Data.General.AffiliateUrl != '-')
+                    angular.element('.affiliate-'+coin).html('<a target="_blank" style="color: blue;" href="'+$scope.coins[coin].affiliate+'">'+$scope.coins[coin].affiliate.split('//')[1].replace('/', '')+'</a>');
                 angular.element('.start-date-'+coin).html($scope.coins[coin].start_date);
             }, function(err) {
                 console.log('########');
@@ -252,11 +276,11 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
 
         CorsRequest.get(`data/pricemultifull?fsyms=${sym_arr_str}&tsyms=USD`).then(function(result) {
             for (var coin in result.data.DISPLAY) {
-                $scope.coins[coin].current_price = result.data.DISPLAY[coin].USD.PRICE;
+                $scope.coins[coin].current_price = $scope.formatNumber(Number(result.data.RAW[coin].USD.PRICE), '$');
                 $scope.coins[coin].market_cap = result.data.DISPLAY[coin].USD.MKTCAP;
-                $scope.coins[coin].volumedayto = result.data.DISPLAY[coin].USD.VOLUMEDAYTO;
-                $scope.coins[coin].supply = result.data.DISPLAY[coin].USD.SUPPLY;
-                $scope.coins[coin].change24hour = result.data.DISPLAY[coin].USD.CHANGE24HOUR;
+                $scope.coins[coin].volumedayto = $scope.formatNumber(result.data.RAW[coin].USD.VOLUMEDAYTO, '$');
+                $scope.coins[coin].supply = $scope.formatNumber(result.data.RAW[coin].USD.SUPPLY, result.data.DISPLAY[coin].USD.FROMSYMBOL);
+                $scope.coins[coin].change24hour = $scope.formatNumber(Number(result.data.RAW[coin].USD.CHANGE24HOUR), '$');
 
                 angular.element('.current-price-'+coin).html($scope.coins[coin].current_price);
                 angular.element('.market-cap-'+coin).html($scope.coins[coin].market_cap);
@@ -302,7 +326,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         DTColumnBuilder.newColumn('affiliate').withTitle('Website').renderWith(function(data, type, full) {
             return `<span class="affiliate-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('search_vol').withTitle('Google Search Volume').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('search_vol').withTitle('Search Trend Volume').renderWith(function(data, type, full) {
             return `<span class="search-vol-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
         DTColumnBuilder.newColumn('search_vol_change').withTitle('Search Volume Change').renderWith(function(data, type, full) {
@@ -311,7 +335,9 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         DTColumnBuilder.newColumn('search_vol_change_pro').withTitle('Search Volume Change %').renderWith(function(data, type, full) {
             return `<span class="search-vol-change-pro-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('search_vol').withTitle('Discussion Link')
+        DTColumnBuilder.newColumn('search_vol').withTitle('Affiliate Link').renderWith(function(data, type, full) {
+            return `<a href="https://binance.com/?ref=25197090" style="color: blue;" target="_blank">Buy/Sell</a>`;
+        })
     ];
 
     $scope.someClickHandler = someClickHandler;
