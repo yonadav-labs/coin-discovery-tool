@@ -101,7 +101,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         return chartData;
     }
 
-    $scope.generateDataSetsSearch = function(rawChartData) {        
+    $scope.generateDataSetsSearch = function(rawChartData, title) {        
         return [{
             "color": "blue",
             "fieldMappings": [ {
@@ -114,7 +114,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
 
             "dataProvider": rawChartData,
             "categoryField": "date",
-            "title": $scope.price_param.coin
+            "title": title
         }];
     }
 
@@ -130,7 +130,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         $scope.loadingData = false;
         $scope.search_change = r.data[r.data.length-1].value - r.data[0].value;
 
-        var dataSets = $scope.generateDataSetsSearch(r.data);
+        var dataSets = $scope.generateDataSetsSearch(r.data, $scope.price_param.coin);
         $scope.drawChart(dataSets, 'ss', 'chart-search');
     }
 
@@ -145,12 +145,13 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
     };
 
     $scope.drawCustomTrends = () => {
+        $scope.drawTrends();
         if ($scope.price_param.custom.trim()) {
             $scope.loadingData = true;
             Request.get(`getTrends/${$scope.price_param.custom}/${$scope.price_param.period}`).then(function(r) {
                 $scope.loadingData = false;
 
-                var dataSets = $scope.generateDataSetsSearch(r.data);
+                var dataSets = $scope.generateDataSetsSearch(r.data, $scope.price_param.custom);
                 $scope.drawChart(dataSets, 'ss', 'chart-search-custom');            
             });            
         }

@@ -118,13 +118,13 @@
                             <div class="clearfix"></div>
                             <div class="m-b-sm">
                                 <center style="margin-top: 15px">
-                                    <div class="btn-group" ng-init="price_param.period = 24">
-                                        <label ng-click="drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="price_param.period" btn-radio="24" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 24 Hours</label>
-                                        <label ng-click="drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty active ng-valid-parse" ng-model="price_param.period" btn-radio="150" aria-invalid="false"><i class="fa fa-check text-active"></i> Last Week</label>
-                                        <label ng-click="drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="price_param.period" btn-radio="720" aria-invalid="false"><i class="fa fa-check text-active"></i> Last Month</label>
-                                        <label ng-click="drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="price_param.period" btn-radio="90" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 3 Months</label>
-                                        <label ng-click="drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="price_param.period" btn-radio="180" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 6 Months</label>
-                                        <label ng-click="drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="price_param.period" btn-radio="365" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 12 Months</label>
+                                    <div class="btn-group" ng-init="radioModel = 'Day'">
+                                        <label ng-click="price_param.period=24;drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel" btn-radio="'Day'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 24 Hours</label>
+                                        <label ng-click="price_param.period=150;drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty active ng-valid-parse" ng-model="radioModel" btn-radio="'Week'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last Week</label>
+                                        <label ng-click="price_param.period=720;drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel" btn-radio="'Month'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last Month</label>
+                                        <label ng-click="price_param.period=90;drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel" btn-radio="'3 Months'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 3 Months</label>
+                                        <label ng-click="price_param.period=180;drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel" btn-radio="'6 Months'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 6 Months</label>
+                                        <label ng-click="price_param.period=365;drawCustomTrends();" class="btn btn-sm btn-default ng-untouched ng-valid ng-dirty" ng-model="radioModel" btn-radio="'Year'" aria-invalid="false"><i class="fa fa-check text-active"></i> Last 12 Months</label>
                                     </div>
                                 </center>
                             </div>
