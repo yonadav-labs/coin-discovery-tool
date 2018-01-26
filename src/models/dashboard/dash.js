@@ -127,11 +127,25 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
     }
 
     function drawSearchTrend(r) {
+        var vol_change = getSearchChange(r.data),
+            vol = 0;
+
         $scope.loadingData = false;
-        $scope.search_change = r.data[r.data.length-1].value - r.data[0].value;
+        for (i = 0; i < r.data.length; i++)
+            vol = vol + r.data[i].value;
+
+        $scope.search_change = (vol_change * 100 / vol).toFixed(2) + ' %';
 
         var dataSets = $scope.generateDataSetsSearch(r.data, $scope.price_param.coin);
         $scope.drawChart(dataSets, 'ss', 'chart-search');
+    }
+
+    function getSearchChange(data) {
+        var res = 0
+        for(i = 1; i < data.length / 2; i++) 
+            res = res + (data[data.length-i].value - data[i].value);
+
+        return res;
     }
 
     $scope.drawTrends = () => {
@@ -262,9 +276,14 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
             Request.get(`getTrends/${sym}/24`).then(function(result) {
                 var coin = result.config.url.split('/')[6]
                     coin_ = coin.replace('*', ''),
-                    vol = result.data[result.data.length-1].value,
-                    vol_change = result.data[result.data.length-1].value - result.data[result.data.length-2].value;
-                    vol_change_pro = vol ? (vol_change * 100 / vol).toFixed(2) : 0,
+                    vol = 0,
+                    vol_change_pro = 0,
+                    vol_change = getSearchChange(result.data);
+
+                for (i = 0; i < result.data.length; i++)
+                    vol = vol + result.data[i].value;
+
+                vol_change_pro = (vol_change * 100 / vol).toFixed(2);
 
                 $scope.coins[coin].search_vol = vol;
                 $scope.coins[coin].search_vol_change = vol_change;
