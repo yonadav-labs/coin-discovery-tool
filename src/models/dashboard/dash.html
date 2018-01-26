@@ -67,7 +67,7 @@
                                 <select ng-model="price_param.coin" ng-options="coin for coin in symbol_list" ng-change="drawTrends();">
                                 </select>
                                 <label style="margin-left: 15px;">Change: </label>
-                                <label ng-class="search_change > 0 ? 'text-success' : 'text-danger'"> 
+                                <label ng-class="search_change.indexOf('-') < 0 ? 'text-success' : 'text-danger'"> 
                                     <strong>{{ search_change }}</strong> 
                                 </label>
                             </div>

@@ -258,7 +258,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
             var cid = cid_arr[i],
                 sym = sym_arr[i];
 
-            CorsRequest.get(`https://www.cryptocompare.com/api/data/coinsnapshotfullbyid/?id=${cid}`, true).then(function(result) {
+            Request.get(`coinInfo/${cid}`, true).then(function(result) {
                 var coin = result.data.Data.General.Symbol,
                     sdates = result.data.Data.General.StartDate.split('/');
                 
