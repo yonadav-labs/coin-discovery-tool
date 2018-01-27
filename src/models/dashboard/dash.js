@@ -127,14 +127,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
     }
 
     function drawSearchTrend(r) {
-        var vol_change = getSearchChange(r.data),
-            vol = 0;
-
-        $scope.loadingData = false;
-        for (i = 0; i < r.data.length; i++)
-            vol = vol + r.data[i].value;
-
-        $scope.search_change = (vol_change * 100 / vol).toFixed(2) + ' %';
+        $scope.search_change = (r.data[r.data.length-1].value - r.data[0].value) + ' %';
 
         var dataSets = $scope.generateDataSetsSearch(r.data, $scope.price_param.coin);
         $scope.drawChart(dataSets, 'ss', 'chart-search');
@@ -276,28 +269,11 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
             Request.get(`getTrends/${sym}/24`).then(function(result) {
                 var coin = result.config.url.split('/')[6]
                     coin_ = coin.replace('*', ''),
-                    vol = 0,
-                    vol_change_pro = 0,
-                    vol_change = getSearchChange(result.data);
+                    vol_change_pro = result.data[result.data.length-1].value - result.data[0].value;
 
-                for (i = 0; i < result.data.length; i++)
-                    vol = vol + result.data[i].value;
-
-                vol_change_pro = (vol_change * 100 / vol).toFixed(2);
-
-                $scope.coins[coin].search_vol = vol;
-                $scope.coins[coin].search_vol_change = vol_change;
                 $scope.coins[coin].search_vol_change_pro = vol_change_pro;
 
-                angular.element('.search-vol-'+coin_).html(vol);
-                angular.element('.search-vol-change-'+coin_).html(vol_change);
                 angular.element('.search-vol-change-pro-'+coin_).html(vol_change_pro+'%');
-
-                if (vol_change < 0) {
-                    angular.element('.search-vol-change-'+coin_).addClass('text-danger');
-                } else {
-                    angular.element('.search-vol-change-'+coin_).addClass('text-success');
-                }
 
                 if (vol_change_pro < 0) {
                     angular.element('.search-vol-change-pro-'+coin_).addClass('text-danger');
@@ -337,10 +313,10 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
             return `<span url="${full.ImageUrl}" symbol="${full.Name}">-</span>`;
         }).withOption('type', 'string'),
         DTColumnBuilder.newColumn('FullName').withTitle('Coin Name'),
-        DTColumnBuilder.newColumn('current_price', 'Current Price').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('current_price', 'Current    Price').renderWith(function(data, type, full) {
             return `<span class="current-price-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('market_cap').withTitle('Market Cap').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('market_cap').withTitle('MarketCap').renderWith(function(data, type, full) {
             return `<span class="market-cap-${full.Symbol.replace('*', '')}" cid="${full.Id}">-</span>`;
         }).withOption('type', 'num-fmt'),
         DTColumnBuilder.newColumn('volumedayto').withTitle('Volume Day To').renderWith(function(data, type, full) {
@@ -358,12 +334,6 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         }),
         DTColumnBuilder.newColumn('affiliate').withTitle('Website').renderWith(function(data, type, full) {
             return `<span class="affiliate-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
-        }),
-        DTColumnBuilder.newColumn('search_vol').withTitle('Search Trend Volume').renderWith(function(data, type, full) {
-            return `<span class="search-vol-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
-        }),
-        DTColumnBuilder.newColumn('search_vol_change').withTitle('Search Volume Change').renderWith(function(data, type, full) {
-            return `<span class="search-vol-change-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
         DTColumnBuilder.newColumn('search_vol_change_pro').withTitle('Search Volume Change %').renderWith(function(data, type, full) {
             return `<span class="search-vol-change-pro-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
