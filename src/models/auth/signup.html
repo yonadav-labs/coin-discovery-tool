@@ -24,13 +24,10 @@
                     <input type="password" placeholder="Confirm Password" class="form-control no-border" ng-model="postData.password2" required>
                 </div>
                 <div class="list-group-item">
-                    <input type="text" placeholder="Phone" class="form-control no-border" ng-model="postData.phone" required>
+                    <input type="text" placeholder="Phone" class="form-control no-border" ng-model="postData.phone">
                 </div>
                 <div class="list-group-item">
                     <input type="text" placeholder="Zip code" class="form-control no-border" ng-model="postData.zip_code" required>
-                </div>
-                <div class="list-group-item">
-                    <input type="text" placeholder="PIN" class="form-control no-border" ng-model="postData.pin" required>
                 </div>
             </div>
             <button type="submit" class="btn btn-lg btn-primary btn-block" ng-disabled='form.$invalid || showLoader'>

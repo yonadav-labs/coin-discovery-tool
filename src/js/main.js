@@ -13,7 +13,7 @@ angular.module('app')
 
       // config
       $scope.app = {
-        name: 'The Altcoin List',
+        name: 'Altcoin Trender',
         version: '1.0.0',
         // for chart colors
         color: {
