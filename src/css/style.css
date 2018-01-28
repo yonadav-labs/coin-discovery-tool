@@ -32,3 +32,9 @@ a[href="http://www.amcharts.com/javascript-charts/"]{
 	width: 120px;
 	margin-left: 12px;
 }
+
+@media screen and (max-width: 768px) {
+    .coin-list {
+        margin: 10px;
+    }
+}

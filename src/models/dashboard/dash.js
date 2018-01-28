@@ -121,6 +121,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
     function drawPriceHistory(r) {
         $scope.loadingData = false;
         $scope.change = r.data.Data[$scope.price_param.period].close - r.data.Data[0].close;
+        $scope.change_pro = ($scope.change * 100 / r.data.Data[$scope.price_param.period].close).toFixed(2);
 
         var dataSets = $scope.generateDataSets([{...r.data}]);
         $scope.drawChart(dataSets, 'ss', "chart-user");
@@ -319,26 +320,26 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         DTColumnBuilder.newColumn('market_cap').withTitle('MarketCap').renderWith(function(data, type, full) {
             return `<span class="market-cap-${full.Symbol.replace('*', '')}" cid="${full.Id}">-</span>`;
         }).withOption('type', 'num-fmt'),
-        DTColumnBuilder.newColumn('volumedayto').withTitle('Volume Day To').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('volumedayto').withTitle('24h Price Change (USD)').renderWith(function(data, type, full) {
             return `<span class="volumedayto-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('change24hour').withTitle('Change 24 Hour').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('change24hour').withTitle('24h Price Change % (USD)').renderWith(function(data, type, full) {
             return `<span class="change24hour-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('supply').withTitle('Supply').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('supply').withTitle('In Circulation').renderWith(function(data, type, full) {
             return `<span class="supply-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('TotalCoinSupply', 'Total Coin Supply').withOption('type', 'num-fmt'),
-        DTColumnBuilder.newColumn('start_date').withTitle('Start Date').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('TotalCoinSupply', 'Max Supply').withOption('type', 'num-fmt'),
+        DTColumnBuilder.newColumn('start_date').withTitle('Coin Launch Date').renderWith(function(data, type, full) {
             return `<span class="start-date-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
         DTColumnBuilder.newColumn('affiliate').withTitle('Website').renderWith(function(data, type, full) {
             return `<span class="affiliate-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('search_vol_change_pro').withTitle('Search Volume Change %').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('search_vol_change_pro').withTitle('Search Volume Change % (24h)').renderWith(function(data, type, full) {
             return `<span class="search-vol-change-pro-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('search_vol').withTitle('Affiliate Link').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('search_vol').withTitle('Buy / Sell').renderWith(function(data, type, full) {
             return `<a href="https://binance.com/?ref=25197090" style="color: blue;" target="_blank">Buy/Sell</a>`;
         })
     ];

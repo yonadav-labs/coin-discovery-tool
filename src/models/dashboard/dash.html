@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col-sm-6 col-xs-12">
                 <h1 class="m-n font-thin h3 text-black">Dashboard</h1>
-                <small class="text-muted">Watch Cryptocurrncy Trends </small>
+                <small class="text-muted">Currncy Trends </small>
             </div>
         </div>
     </div>
@@ -20,14 +20,24 @@
                             Price
                         </div>
                         <div class="panel-body">
-                            <div class="coin-list">
-                                <label>Cryptocurrency: </label>
-                                <select ng-model="price_param.coin" ng-options="coin for coin in symbol_list" ng-change="drawTrends();">
-                                </select>
-                                <label style="margin-left: 15px;">Change: </label>
-                                <label ng-class="change > 0 ? 'text-success' : 'text-danger'"> 
-                                    <strong>{{ change | currency }}</strong> 
-                                </label>
+                            <div class="coin-list row">                                
+                                <div class="col-md-4">
+                                    <label>Coin: </label>
+                                    <select ng-model="price_param.coin" ng-options="coin for coin in symbol_list" ng-change="drawTrends();">
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Change: </label>
+                                    <label ng-class="change > 0 ? 'text-success' : 'text-danger'"> 
+                                        <strong>{{ change | currency }}</strong> 
+                                    </label>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Change %: </label>
+                                    <label ng-class="change > 0 ? 'text-success' : 'text-danger'"> 
+                                        <strong>{{ change_pro }} %</strong> 
+                                    </label>
+                                </div>
                             </div>
 
                             <div style="text-align:center" ng-if="loadingData" class="col-sm-12">
@@ -63,7 +73,7 @@
                         </div>
                         <div class="panel-body">
                             <div class="coin-list">
-                                <label>Cryptocurrency: </label>
+                                <label>Coin: </label>
                                 <select ng-model="price_param.coin" ng-options="coin for coin in symbol_list" ng-change="drawTrends();">
                                 </select>
                                 <label style="margin-left: 15px;">Change: </label>
