@@ -267,21 +267,21 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
                 console.log(err);
             });
 
-            Request.get(`getTrends/${sym}/24`).then(function(result) {
-                var coin = result.config.url.split('/')[6]
-                    coin_ = coin.replace('*', ''),
-                    vol_change_pro = result.data[result.data.length-1].value - result.data[0].value;
+            // Request.get(`getTrends/${sym}/24`).then(function(result) {
+            //     var coin = result.config.url.split('/')[6]
+            //         coin_ = coin.replace('*', ''),
+            //         vol_change_pro = result.data[result.data.length-1].value - result.data[0].value;
 
-                $scope.coins[coin].search_vol_change_pro = vol_change_pro;
+            //     $scope.coins[coin].search_vol_change_pro = vol_change_pro;
 
-                angular.element('.search-vol-change-pro-'+coin_).html(vol_change_pro+'%');
+            //     angular.element('.search-vol-change-pro-'+coin_).html(vol_change_pro+'%');
 
-                if (vol_change_pro < 0) {
-                    angular.element('.search-vol-change-pro-'+coin_).addClass('text-danger');
-                } else {
-                    angular.element('.search-vol-change-pro-'+coin_).addClass('text-success');
-                }
-            });
+            //     if (vol_change_pro < 0) {
+            //         angular.element('.search-vol-change-pro-'+coin_).addClass('text-danger');
+            //     } else {
+            //         angular.element('.search-vol-change-pro-'+coin_).addClass('text-success');
+            //     }
+            // });
         }
 
         CorsRequest.get(`data/pricemultifull?fsyms=${sym_arr_str}&tsyms=USD`).then(function(result) {
@@ -335,9 +335,6 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         }),
         DTColumnBuilder.newColumn('affiliate').withTitle('Website').renderWith(function(data, type, full) {
             return `<span class="affiliate-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
-        }),
-        DTColumnBuilder.newColumn('search_vol_change_pro').withTitle('Search Volume Change % (24h)').renderWith(function(data, type, full) {
-            return `<span class="search-vol-change-pro-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
         DTColumnBuilder.newColumn('search_vol').withTitle('Buy / Sell').renderWith(function(data, type, full) {
             return `<a href="https://binance.com/?ref=25197090" style="color: blue;" target="_blank">Buy/Sell</a>`;
