@@ -66,6 +66,8 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
             "export": {
                 "enabled": true
             },
+
+            "dataDateFormat": "YYYY-MM-DD HH:NN:SS"
         } );
         chart.validateData();
     }
