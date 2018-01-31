@@ -231,7 +231,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
             if (url.indexOf('img') < 0)
                 settings.nTBody.children[i].children[2].innerHTML = '<img width=24 style="margin-right:5px;" src="https://www.cryptocompare.com'+url+'">';                
         }       
-    }).withOption('lengthMenu', [10, 25, 50]).withOption('rowCallback', rowCallback);
+    }).withOption('lengthMenu', [10, 25, 50]).withOption('rowCallback', rowCallback).withOption('responsive', true);;
 
     $scope.dtColumns = [
         DTColumnBuilder.newColumn('sortorder', 'Rank'),
