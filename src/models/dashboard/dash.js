@@ -203,7 +203,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
                 $scope.coins[coin].start_date = '-';
                 $scope.coins[coin].affiliate = '-';
                 $scope.coins[coin].market_cap = '-';
-                $scope.coins[coin].volumedayto = '-';
+                $scope.coins[coin].change24hour_pro = '-';
                 $scope.coins[coin].change24hour = '-';
                 $scope.coins[coin].supply = '-';
                 $scope.coins[coin].search_vol = '-';
@@ -288,13 +288,13 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
             for (var coin in result.data.DISPLAY) {
                 $scope.coins[coin].current_price = $scope.formatNumber(Number(result.data.RAW[coin].USD.PRICE), '$');
                 $scope.coins[coin].market_cap = result.data.DISPLAY[coin].USD.MKTCAP;
-                $scope.coins[coin].volumedayto = $scope.formatNumber(result.data.RAW[coin].USD.VOLUMEDAYTO, '$');
+                $scope.coins[coin].change24hour_pro = $scope.formatNumber(result.data.RAW[coin].USD.CHANGEPCT24HOUR, '%');
                 $scope.coins[coin].supply = $scope.formatNumber(result.data.RAW[coin].USD.SUPPLY, result.data.DISPLAY[coin].USD.FROMSYMBOL);
                 $scope.coins[coin].change24hour = $scope.formatNumber(Number(result.data.RAW[coin].USD.CHANGE24HOUR), '$');
 
                 angular.element('.current-price-'+coin).html($scope.coins[coin].current_price);
                 angular.element('.market-cap-'+coin).html($scope.coins[coin].market_cap);
-                angular.element('.volumedayto-'+coin).html($scope.coins[coin].volumedayto);
+                angular.element('.change24hour_pro-'+coin).html($scope.coins[coin].change24hour_pro);
                 angular.element('.supply-'+coin).html($scope.coins[coin].supply);
 
                 var price_change = $scope.coins[coin].change24hour;
@@ -303,6 +303,11 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
                     angular.element('.change24hour-'+coin).addClass('text-danger');
                 } else {
                     angular.element('.change24hour-'+coin).addClass('text-success');
+                }
+                if (result.data.RAW[coin].USD.CHANGEPCT24HOUR < 0) {
+                    angular.element('.change24hour_pro-'+coin).addClass('text-danger');
+                } else {
+                    angular.element('.change24hour_pro-'+coin).addClass('text-success');
                 }
             }
         });        
@@ -320,10 +325,10 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
         DTColumnBuilder.newColumn('market_cap').withTitle('MarketCap').renderWith(function(data, type, full) {
             return `<span class="market-cap-${full.Symbol.replace('*', '')}" cid="${full.Id}">-</span>`;
         }).withOption('type', 'num-fmt'),
-        DTColumnBuilder.newColumn('volumedayto').withTitle('24h Price Change (USD)').renderWith(function(data, type, full) {
-            return `<span class="volumedayto-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
+        DTColumnBuilder.newColumn('change24hour_pro').withTitle('24h Price Change % (USD)').renderWith(function(data, type, full) {
+            return `<span class="change24hour_pro-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
-        DTColumnBuilder.newColumn('change24hour').withTitle('24h Price Change % (USD)').renderWith(function(data, type, full) {
+        DTColumnBuilder.newColumn('change24hour').withTitle('24h Price Change (USD)').renderWith(function(data, type, full) {
             return `<span class="change24hour-${full.Symbol.replace('*', '')}" symbol="${full.Symbol}">-</span>`;
         }),
         DTColumnBuilder.newColumn('supply').withTitle('In Circulation').renderWith(function(data, type, full) {
