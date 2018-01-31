@@ -128,7 +128,7 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
             $scope.change_pro = '-';
         }
 
-        var dataSets = $scope.generateDataSets([{...r.data}]);
+        var dataSets = $scope.generateDataSets([r.data]);
         $scope.drawChart(dataSets, 'ss', "chart-user");
     }
 
