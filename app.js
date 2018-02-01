@@ -19,7 +19,17 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+app.use('/*', function(req, res, next) {
+    // console.log(req.headers.host, req.url);
+    // if(/^localhost.*/.test(req.headers.host)) {
+    if(/^alt.*/.test(req.headers.host)) {
+        res.redirect(req.protocol + '://www.' + req.headers.host + req.url, 301);
+        // res.redirect(req.protocol + '://127.0.0.1:5000' + req.url, 301);
+    } else {
+        next();
+    }
+});
 
 app.use('/', express.static(__dirname + '/src'));
 
-server.listen(5000);
+server.listen(80);
