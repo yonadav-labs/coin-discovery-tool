@@ -208,10 +208,15 @@ app.controller('DashCtrl', function ($scope, $stateParams, $state, $interval, $r
                 $scope.symbol_list.push(result.data[i].symbol)                ;
 
                 var tmp = $scope.coins[i].affiliateurl;
-                if (tmp.indexOf('//') > -1) 
-                    tmp = tmp.split('//')[1];                    
-                if (tmp.indexOf('/') > -1) 
-                    tmp = tmp.split('/')[0];
+                if (tmp) {
+                    if (tmp.indexOf('//') > -1) 
+                        tmp = tmp.split('//')[1];                    
+                    if (tmp.indexOf('/') > -1) 
+                        tmp = tmp.split('/')[0];                    
+                } else {
+                    tmp = '';
+                }
+                
                 $scope.coins[i].affiliateurl = tmp;                
             }
 
